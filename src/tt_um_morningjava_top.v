@@ -21,8 +21,9 @@ module tt_um_morningjava_top (
   output wire [7:0] uio_oe    // IOs: Bidirectional Enable path (active high: 0=input, 1=output)
 
 );
-  assign uo_out = clk ? ui_in : 8'x0;
-  assign uio_out[7:4] = rst_n ? uio_in[3:0] : 4'x0;
-  assign uio_oe = ena ? 8'xF0 : 8'x00;
+  assign uo_out = clk ? ui_in : 8'h0;
+  assign uio_out[3:0] = uio_in[7:4];
+  assign uio_out[7:4] = rst_n ? uio_in[3:0] : 4'h0;
+  assign uio_oe = ena ? 8'hF0 : 8'h00;
   
 endmodule
