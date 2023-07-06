@@ -27,7 +27,7 @@ module tt_um_morningjava_top (
   wire [3:0] dac;
   
   assign uo_out[3:0] = dac;
-  assign uo_out[7:4] = 4'h00;
+  assign uo_out[7:4] = 4'h0;
   assign uio_out = 8'h00;
   assign uio_oe = 8'h00;
 
