@@ -21,17 +21,15 @@ module tt_um_morningjava_top (
   output wire [7:0] uio_oe    // IOs: Bidirectional Enable path (active high: 0=input, 1=output)
 ) /* synthesis syn_hier="fixed" */;
 
-  //assign uio_out[3:0] = uio_in[7:4];
-  //assign uio_out[7:4] = rst_n ? uio_in[3:0] : 4'h0;
-  //assign uio_oe = ena ? 8'hF0 : 8'h00;
-
   wire clk_uart = ui_in[0];
   wire sdi = ui_in[1];  // serial data input
   wire sck;
   wire [3:0] dac;
   
   assign uo_out[3:0] = dac;
-  //assign uo_out[7:4] = ui_in[7:4];
+  assign uo_out[7:4] = 4'h00;
+  assign uio_out = 8'h00;
+  assign uio_oe = 8'h00;
 
   // Bit-clock generator derived from asynchronous serial data input
   clk_gen clk_gen_inst (
