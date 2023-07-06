@@ -2,7 +2,12 @@
 # TinyTapeout project information
 project:
   wokwi_id:    0        # If using wokwi, set this to your project's ID
-  source_files:        
+  source_files:
+    - clk_gen.v
+    - decoder.v
+    - frame.v
+    - rectangle.v
+    - chiptune.v
     - tt_um_morningjava_top.v
   top_module:  "tt_um_morningjava_top"      # Put the name of your top module here, must start with "tt_um_". Make it unique by prepending your github username
 
@@ -69,5 +74,5 @@ documentation:
   external_hw:  "Computer COM port"
   discord:      "morningjava"
   doc_link:     "https://github.com/WallieEverest/tt04/blob/main/README.md"
-  clock_hz:     3579000 # Clock frequency in Hz
+  clock_hz:     3579545 # Clock frequency in Hz
   picture:      "./image/tt04.png"
