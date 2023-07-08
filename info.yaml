@@ -1,7 +1,7 @@
 --- 
 # TinyTapeout project information
 project:
-  wokwi_id:    0        # If using wokwi, set this to your project's ID
+  wokwi_id: 0
   source_files:
     - clk_gen.v
     - decoder.v
@@ -9,11 +9,10 @@ project:
     - rectangle.v
     - chiptune.v
     - tt_um_morningjava_top.v
-  top_module:  "tt_um_morningjava_top"      # Put the name of your top module here, must start with "tt_um_". Make it unique by prepending your github username
+  top_module: "tt_um_morningjava_top"
 
 # How many tiles your design occupies? A single tile is about 167x108 uM.
-# Before changing this, please reach out to us on discord to discuss your design.
-  tiles: "2x2"    # Valid values: 1x1, 1x2, 2x2, 4x2 or 8x2
+  tiles: "2x2"  # Valid values: 1x1, 1x2, 2x2, 4x2 or 8x2
 
 # Keep a track of the submission yaml
 yaml_version: 4
@@ -23,10 +22,10 @@ yaml_version: 4
 #
 # Here is a great example: https://github.com/davidsiaw/tt02-davidsiaw-stackcalc/blob/38c5647f83aad2aec675d566aa3d67b98f0aac81/info.yaml
 documentation: 
-  author:       "Wallace Everest"
-  title:        "ChipTune"
-  language:     "Verilog"
-  description:  "Vintage 8-bit sound generator"
+  author:      "Wallace Everest"
+  title:       "ChipTune"
+  language:    "Verilog"
+  description: "Vintage 8-bit sound generator"
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
