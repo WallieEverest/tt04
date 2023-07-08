@@ -48,7 +48,7 @@ module rectangle (
   wire        sweep_decrement = reg_4001[3];
   wire [ 2:0] sweep_rate      = reg_4001[6:4];
   wire        sweep_enable    = reg_4001[7];
-  wire [10:0] wavelength     = {reg_4003[2:0], reg_4002};
+  wire [10:0] wavelength      = {reg_4003[2:0], reg_4002};
   wire [ 4:0] length_select   = reg_4003[7:3];
   wire [ 3:0] volume;
   wire length_count_zero;

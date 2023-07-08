@@ -25,11 +25,20 @@ module tt_um_morningjava_top (
   wire sdi = ui_in[1];  // serial data input
   wire sck;
   wire [3:0] dac;
+  reg reset = 0;
   
   assign uo_out[3:0] = dac;
   assign uo_out[7:4] = 4'h0;
   assign uio_out = 8'h00;
   assign uio_oe = 8'h00;
+
+  // Synchronize external reset to clock
+  always @(posedge clk) begin
+    if (rst_n && ena)
+      reset <= 0;
+    else
+      reset <= 1;
+  end
 
   // Bit-clock generator derived from asynchronous serial data input
   clk_gen clk_gen_inst (
