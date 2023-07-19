@@ -1,7 +1,7 @@
-// Title:   Rectangule pulse generator
-// File:    rectangle.v
+// Title:   Triangule pulse generator
+// File:    triangle.v
 // Author:  Wallace Everest
-// Date:    28-APR-2023
+// Date:    09-JUL-2023
 // URL:     https://github.com/wallieeverest/tt04
 // License: Apache 2.0
 //
@@ -209,3 +209,123 @@ module rectangle (
   end
 
 endmodule
+
+/*
+entity TriangleChan is
+  port (
+    MMC5         : in std_logic;
+    clk          : in std_logic;
+    ce           : in std_logic;
+    reset        : in std_logic;
+    sq2          : in std_logic;
+    Addr         : in std_logic_vector(1 downto 0);
+    DIN          : in std_logic_vector(7 downto 0);
+    MW           : in std_logic;
+    LenCtr_Clock : in std_logic;
+    Env_Clock    : in std_logic;
+    odd_or_even  : in std_logic;
+    Enabled      : in std_logic;
+    LenCtr_In    : in std_logic_vector(7 downto 0);
+    Sample       : out std_logic_vector(3 downto 0);
+    IsNonZero    : out std_logic
+  );
+  
+
+architecture rtl of TriangleChan is
+
+module TriangleChan(input clk, input ce, input reset,
+                    input [1:0] Addr,
+                    input [7:0] DIN,
+                    input MW,
+                    input LenCtr_Clock,
+                    input LinCtr_Clock,
+                    input Enabled,
+                    input [7:0] LenCtr_In,
+                    output reg [3:0] Sample,
+                    output IsNonZero);
+  --
+  reg [10:0] Period, TimerCtr;
+  reg [4:0] SeqPos;
+  --
+  -- Linear counter state
+  reg [6:0] LinCtrPeriod, LinCtr;
+  reg LinCtrl, LinHalt;
+  wire LinCtrZero = (LinCtr == 0);
+  --
+  -- Length counter state
+  reg [7:0] LenCtr;
+  wire LenCtrHalt = LinCtrl; -- Aliased bit
+  wire LenCtrZero = (LenCtr == 0);
+  assign IsNonZero = !LenCtrZero;
+  --
+  process (clk)
+  begin
+    if rising_edge(clk)
+      if (reset = '1') then
+    Period <= 0;
+    TimerCtr <= 0;
+    SeqPos <= 0;
+    LinCtrPeriod <= 0;
+    LinCtr <= 0;
+    --LinCtrl <= 0; do not reset
+    LinHalt <= 0;
+    LenCtr <= 0;
+  end else if (ce) begin
+    -- Check if writing to the regs of this channel 
+    if (MW) begin
+      case (Addr)
+      0: begin
+        LinCtrl <= DIN[7];
+        LinCtrPeriod <= DIN[6:0];
+      end
+      2: begin
+        Period[7:0] <= DIN;
+      end
+      3: begin
+        Period[10:8] <= DIN[2:0];
+        LenCtr <= LenCtr_In;
+        LinHalt <= 1;
+      end
+      endcase
+    end
+
+    -- Count down the period timer...
+    if (TimerCtr == 0) begin
+      TimerCtr <= Period;
+    end else begin
+      TimerCtr <= TimerCtr - 1'd1;
+    end
+    --
+    -- Clock the length counter?
+    if (LenCtr_Clock && !LenCtrZero && !LenCtrHalt) begin
+      LenCtr <= LenCtr - 1'd1;
+    end
+    --
+    -- Clock the linear counter?
+    if (LinCtr_Clock) begin
+      if (LinHalt)
+        LinCtr <= LinCtrPeriod;
+      else if (!LinCtrZero)
+        LinCtr <= LinCtr - 1'd1;
+      if (!LinCtrl)
+        LinHalt <= 0;
+    end
+    --
+    -- Length counter forced to zero if disabled.
+    if (!Enabled)
+      LenCtr <= 0;
+      --
+    -- Clock the sequencer position
+    if (TimerCtr == 0 && !LenCtrZero && !LinCtrZero)
+      SeqPos <= SeqPos + 1'd1;
+  end
+  -- Generate the output
+  -- XXX: Ultrisonic frequencies cause issues, so are disabled.
+  -- This can be removed for accuracy if a proper LPF is ever implemented.
+  always @(posedge clk)
+    Sample <= (Period > 1) ? SeqPos[3:0] ^ {4{~SeqPos[4]}} : Sample;
+  --
+    end if;
+  end process;
+end architecture;
+*/

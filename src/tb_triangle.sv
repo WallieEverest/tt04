@@ -1,5 +1,5 @@
-// Title:   Rectangle synthesizer testbench
-// File:    tb_rectangle.sv
+// Title:   Triangle synthesizer testbench
+// File:    tb_triangle.sv
 // Author:  Wallace Everest
 // Date:    12-APR-2023
 // URL:     https://github.com/wallieeverest/tt04
@@ -10,7 +10,7 @@
 `default_nettype none
 `timescale 1ns/100ps
 
-module tb_rectangle ();
+module tb_triangle ();
 
   reg  [7:0] apu_reg [0:31];
   reg  clk = 0;  // 894,720 Hz

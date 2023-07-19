@@ -1,13 +1,11 @@
-// Title:   Tiny Tapeout Simulation Test Procedure
+// Title:   FPGA top-level testbench
 // File:    tb_fpga_top.sv
 // Author:  Wallace Everest
 // Date:    25-MAR-2023
-// URL:     https://github.com/wallieeverest/tt03
+// URL:     https://github.com/wallieeverest/tt04
 // License: Apache 2.0
 //
 // Description:
-// Implementation:
-// Operation:
 
 `default_nettype none
 `timescale 1ns/100ps
@@ -20,27 +18,25 @@ module a_tb_fpga_top ();
   localparam STOP  = 1'b1;
   
   reg  [WIDTH-1:0] message = IDLE;  // default to IDLE pattern
-  wire [7:0] i_data;
-  wire [7:0] o_data;
   reg  clk = 0;
-  reg  trst = 0;
   reg  sck = 0;
-  wire sdi;
-  wire sdo;
-  reg  tms = 0;  // scan chain defaults to bypass
+  wire dtrn = 1;
+  wire rtsn = 0;
+  wire [7:0] i_data = 0;
+  wire [7:0] o_data;
   wire rx = message[0];
 
-  assign i_data = 0;
+  //assign i_data = 0;
 
-  fpga_top fpga_inst (
-    .OSC(clk),
-    .DTRN(trst),
-    .RX(rx),
-    .RTSN(tms),
-    .I_DATA(i_data),
-    .O_DATA(o_data),
-    .TX(),
-    .LED()
+  fpga_top dut (
+    .clk(clk),
+    .dtrn(dtrn),
+    .rx(rx),
+    .rtsn(rtsn),
+    .i_data(i_data),
+    .o_data(o_data),
+    .tx(),
+    .led()
   );
     
   initial forever #41.7ns clk = ~clk;   // 12 MHz system clock

@@ -1,59 +1,46 @@
-// Title:   Top-level wrapper in Verilog
+// Title:   Top-level ASIC wrapper
 // File:    tt_um_morningjava_top.v
 // Author:  Wallie Everest
 // Date:    04-JUL-2023
-// URL:     https://github.com/wallieeverest/tt03
+// URL:     https://github.com/wallieeverest/tt04
 // License: Apache 2.0
 //
 // Description:
-// Implementation:
 
 `default_nettype none
 
 module tt_um_morningjava_top (
   input  wire       clk,      // clock
-  input  wire       rst_n,    // reset_n - low to reset
-  input  wire       ena,      // will go high when the design is enabled
+  input  wire       rst_n,    // active-low asynchronous reset
+  input  wire       ena,      // (unused) active-high design is selected
   input  wire [7:0] ui_in,    // Dedicated inputs
-  input  wire [7:0] uio_in,   // IOs: Bidirectional Input path
+  input  wire [7:0] uio_in,   // Bidirectional input
   output wire [7:0] uo_out,   // Dedicated outputs
-  output wire [7:0] uio_out,  // IOs: Bidirectional Output path
-  output wire [7:0] uio_oe    // IOs: Bidirectional Enable path (active high: 0=input, 1=output)
+  output wire [7:0] uio_out,  // Bidirectional output
+  output wire [7:0] uio_oe    // Bidirectional enable (active-high: 0=input, 1=output)
 ) /* synthesis syn_hier="fixed" */;
 
-  wire clk_uart = ui_in[0];
-  wire sdi = ui_in[1];  // serial data input
-  wire sck;
-  wire [3:0] dac;
-  reg reset = 0;
+  wire pwm;
+  wire blink;
+  wire link;
   
-  assign uo_out[3:0] = dac;
-  assign uo_out[7:4] = 4'h0;
-  assign uio_out = 8'h00;
-  assign uio_oe = 8'h00;
-
-  // Synchronize external reset to clock
-  always @(posedge clk) begin
-    if (rst_n && ena)
-      reset <= 0;
-    else
-      reset <= 1;
-  end
-
-  // Bit-clock generator derived from asynchronous serial data input
-  clk_gen clk_gen_inst (
-    .clk(clk_uart),
-    .rx (sdi),
-    .sck(sck)
-  );
+  assign uo_out[0] = pwm;
+  assign uo_out[1] = blink;
+  assign uo_out[2] = link;
+  assign uo_out[7:3] = 0;
+  assign uio_out = 0;
+  assign uio_oe = 0;
 
   chiptune #(
-    .CLKRATE(3_579_545)  // 315/88
+    .CLKRATE(12_000_000),  // external oscillator
+    .BAUDRATE(9600)        // serial baud rate
   ) chiptune_inst (
-    .clk(clk),
-    .sck(sck),
-    .sdi(sdi),
-    .dac(dac)
+    .osc  (clk),
+    .rst_n(rst_n),
+    .rx   (ui_in[0]),      // serial data input
+    .pwm  (pwm),           // audio PWM
+    .blink(blink),         // status LED
+    .link (link)           // link LED
   );
 
 endmodule

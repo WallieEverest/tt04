@@ -2,37 +2,62 @@
 // File:    chiptune.v
 // Author:  Wallace Everest
 // Date:    12-APR-2023
-// URL:     https://github.com/wallieeverest/tt03
+// URL:     https://github.com/wallieeverest/tt04
 // License: Apache 2.0
 //
 // Description:
-// Implementation:
-// Operation:
 
 `default_nettype none
 
 module chiptune #(
-  parameter CLKRATE = 1_790_000  // system clock rate
+  parameter CLKRATE = 12_000_000,  // external oscillator
+  parameter BAUDRATE = 9600        // serial baud rate
 )(
-  input  wire clk,       // 4800 Hz
-  input  wire sck,       // 300 baud
-  input  wire sdi,       // serial data
-  output wire [3:0] dac  // audio DAC
+  input  wire osc,    // external oscillator
+  input  wire rst_n,  // asynchronous reset
+  input  wire rx,     // serial data
+  output wire pwm,    // audio PWM
+  output wire blink,  // status LED
+  output wire link    // link LED
 );
 
+  wire clk;
+  wire clk_uart;
+  reg reset = 0;
   wire [7:0] reg_4000;
   wire [7:0] reg_4001;
   wire [7:0] reg_4002;
   wire [7:0] reg_4003;
   wire enable_240hz;  // 240 Hz
   wire enable_120hz;  // 120 Hz
-  wire [3:0] p1_out;
   wire reg_change;
-  assign dac = p1_out;
-  
-  decoder decoder_inst (
-    .sck       (sck),
-    .sdi       (sdi),
+  wire [3:0] p1_out;
+  assign pwm = p1_out[0];
+
+  // Synchronize external reset to clock
+  always @(posedge clk) begin
+    if (rst_n == 1)
+      reset <= 0;
+    else
+      reset <= 1;
+  end
+
+  prescaler #(
+    .OSCRATE(12_000_000),  // oscillator frequency
+    .CLKRATE(1_790_000),   // system clock frequency
+    .BAUDRATE(9600)        // baud rate
+  ) prescaler_inst (
+    .osc     (osc),        // system oscillator
+    .rx      (rx),         // serial input for activity indicator
+    .clk     (clk),        // APU system clock, 1.79 MHz
+    .clk_uart(clk_uart),   // 5x UART clock, 48 kHz
+    .blink   (blink),      // 1 Hz blink indicator
+    .link    (link)        // activity indicator
+  );
+
+  uart uart_inst (
+    .clk       (clk_uart),
+    .rx        (rx),
     .reg_4000  (reg_4000),
     .reg_4001  (reg_4001),
     .reg_4002  (reg_4002),
