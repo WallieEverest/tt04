@@ -160,7 +160,7 @@ module rectangle (
       end 
   end
 
-  always @( duty_cycle_type )
+  always @*
   begin
     case ( duty_cycle_type )
       0: duty_cycle_pattern = 8'b00000010;
@@ -170,7 +170,7 @@ module rectangle (
     endcase
   end
   
-  always @( length_select )  // shifted left to count at 60 Hz
+  always @*  // shifted left to count at 60 Hz
   begin
     case ( length_select )
        0: length_preset = 8'h0A;
