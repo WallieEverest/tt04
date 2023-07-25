@@ -33,9 +33,6 @@ set ::env(FP_SIZING) absolute
 set ::env(PL_BASIC_PLACEMENT) {0}
 set ::env(GRT_ALLOW_CONGESTION) "1"
 
-# otherwise fails on small designs at global placement
-set ::env(GRT_CELL_PADDING) "4"
-
 set ::env(FP_IO_HLENGTH) 2
 set ::env(FP_IO_VLENGTH) 2
 
@@ -48,7 +45,7 @@ set ::env(DECAP_CELL) "\
     sky130_ef_sc_hd__decap_12"
 
 # clock
-set ::env(CLOCK_TREE_SYNTH) 1
+set ::env(RUN_CTS) 1
 # period is in ns, so 20ns == 50mHz
 set ::env(CLOCK_PERIOD) "20"
 set ::env(CLOCK_PORT) {clk}
