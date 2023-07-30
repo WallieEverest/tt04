@@ -6,7 +6,7 @@ This project is an audio device that replicates the square-wave sound generators
 
 ## TinyTapeout 4 Configuration
 
-![Top Level Drawing](image/tt04.png)
+![Top Level Drawing](image/tt04.svg)
 
 Devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in two package options, each with 64 pins. TinyTapeout 4 will be packaged in the QFN variant, mounted on a daughterboard for breakout.
 
@@ -59,30 +59,19 @@ The audio portion of the project consists of two rectangular pulse generators. E
 The frequency range of the project is limited by the legacy scanchain, but mid-range frequencies are acceptable. Additional triangle and noise modules will be added in future work when more bandwidth is available.
 
 ### ChipTune Pin Assignments
-| Signal     | Name     |
-| ---------- | ---------|
-| clk        | 12 MHz   |
-| rst_n      | RESET_N  |
-| ena        | SPARE    |
-| ui_in[0]   | RX       |
-| ui_in[1]   | SPARE    |
-| ui_in[2]   | SPARE    |
-| ui_in[3]   | SPARE    |
-| ui_in[4]   | SPARE    |
-| ui_in[5]   | SPARE    |
-| ui_in[6]   | SPARE    |
-| ui_in[7]   | SPARE    |
-| uo_out[0]  | PWM      |
-| uo_out[1]  | BLINK    |
-| uo_out[2]  | LINK     |
-| uo_out[3]  | TX       |
-| uo_out[4]  | SPARE    |
-| uo_out[5]  | SPARE    |
-| uo_out[6]  | SPARE    |
-| uo_out[7]  | SPARE    |
-| uio_in[7]  | SPARE    |
-| uio_out[7] | SPARE    |
-| uio_oe[7]  | SPARE    |
+| Signal     | Name     || Signal     | Name     |
+| ---------- | ---------|| ---------- | ---------|
+| clk        | 12 MHz   || rst_n      | RESET_N  |
+| ena        | SPARE    || uio_oe[7]  | SPARE    |
+| ui_in[0]   | RX       || uo_out[0]  | PWM      |
+| ui_in[1]   | SPARE    || uo_out[1]  | BLINK    |
+| ui_in[2]   | SPARE    || uo_out[2]  | LINK     |
+| ui_in[3]   | SPARE    || uo_out[3]  | TX       |
+| ui_in[4]   | SPARE    || uo_out[4]  | SPARE    |
+| ui_in[5]   | SPARE    || uo_out[5]  | SPARE    |
+| ui_in[6]   | SPARE    || uo_out[6]  | SPARE    |
+| ui_in[7]   | SPARE    || uo_out[7]  | SPARE    |
+| uio_in[7]  | SPARE    || uio_out[7] | SPARE    |
 
 ## Design For Test Considerations
 
