@@ -19,11 +19,10 @@ module chiptune #(
   output wire pwm,    // audio PWM
   output wire blink,  // status LED
   output wire link    // link LED
-);
+) /* synthesis syn_hier="fixed" */;
 
   wire clk;
   wire clk_uart;
-  reg reset = 0;
   wire [7:0] reg_4000;
   wire [7:0] reg_4001;
   wire [7:0] reg_4002;
@@ -31,8 +30,8 @@ module chiptune #(
   wire enable_240hz;  // 240 Hz
   wire enable_120hz;  // 120 Hz
   wire reg_change;
-  wire [3:0] p1_out;
-  assign pwm = p1_out[0];
+  wire [3:0] pulse_out;
+  reg reset = 1 /* synthesis syn_preserve=1 */;
 
   // Synchronize external reset to clock
   always @(posedge clk) begin
@@ -43,16 +42,16 @@ module chiptune #(
   end
 
   prescaler #(
-    .OSCRATE(12_000_000),  // oscillator frequency
-    .CLKRATE(1_790_000),   // system clock frequency
-    .BAUDRATE(9600)        // baud rate
+    .OSCRATE(CLKRATE),    // oscillator frequency
+    .CLKRATE(1_790_000),  // system clock frequency
+    .BAUDRATE(BAUDRATE)   // baud rate
   ) prescaler_inst (
-    .osc     (osc),        // system oscillator
-    .rx      (rx),         // serial input for activity indicator
-    .clk     (clk),        // APU system clock, 1.79 MHz
-    .clk_uart(clk_uart),   // 5x UART clock, 48 kHz
-    .blink   (blink),      // 1 Hz blink indicator
-    .link    (link)        // activity indicator
+    .osc     (osc),       // system oscillator
+    .rx      (rx),        // serial input for activity indicator
+    .clk     (clk),       // APU system clock, 1.79 MHz
+    .clk_uart(clk_uart),  // 5x UART clock, 48 kHz
+    .blink   (blink),     // 1 Hz blink indicator
+    .link    (link)       // activity indicator
   );
 
   uart uart_inst (
@@ -82,7 +81,16 @@ module chiptune #(
     .reg_4002    (reg_4002),
     .reg_4003    (reg_4003),
     .reg_change  (reg_change),
-    .pulse_out   (p1_out)
+    .pulse_out   (pulse_out)
+  );
+
+  audio_pwm #(
+    .WIDTH(4)
+  ) audio_pwm_inst (
+    .clk  (clk),
+    .reset(reset),
+    .data (pulse_out),
+    .pwm  (pwm)
   );
 
 endmodule

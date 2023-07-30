@@ -13,7 +13,7 @@
 
 module uart (
   input  wire clk,  // 5x baud clock
-  input  wire rx,   // asynchronouse serial input
+  input  wire rx,   // asynchronous serial input
   output reg  [7:0] reg_4000 = 0,
   output reg  [7:0] reg_4001 = 0,
   output reg  [7:0] reg_4002 = 0,

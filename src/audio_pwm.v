@@ -14,13 +14,13 @@ module audio_pwm #(
 )(
   input  wire clk,
   input  wire reset,
-  input  wire [WIDTH-1:0] data,
+  input  wire [WIDTH-1:0] data,  // signed input
   output wire pwm
 ) /* synthesis syn_hier="fixed" */;
 
-  reg [WIDTH:0] accum = 0;  // unsigned
   wire [WIDTH:0] data_ext = {1'b0, ~data[WIDTH-1], data[WIDTH-2:0]};  // convert from signed to signed-offset (unsigned)
-  assign pwm = accum[12];  // msb of the accumulator is the PWM output
+  reg [WIDTH:0] accum = 0;    // unsigned
+  assign pwm = accum[WIDTH];  // msb of the accumulator (OVF) is the PWM output
 
   // Delta-modulation function
   always @(posedge clk) begin : audio_pwm_accumulator

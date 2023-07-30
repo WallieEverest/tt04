@@ -21,7 +21,8 @@ module prescaler #(
   output reg  clk_uart = 0,  // 5x baud rate
   output reg  blink = 0,     // 1 Hz
   output reg  link = 0       // serial activity
-);
+)  /* synthesis syn_hier="fixed" */;
+
   localparam [2:0] CLK_DIVISOR = OSCRATE / CLKRATE;  // 1.79 MHz => 6.7
   localparam [7:0] BAUD_DIVISOR = OSCRATE / BAUDRATE / 5;  // 250: 9600 baud => 48,000 Hz
 
@@ -39,7 +40,7 @@ module prescaler #(
   always @(posedge osc) begin
     rx_meta      <= rx;       // capture asynchronous input
     sdi          <= rx_meta;  // align input to the system clock
-    sdi_delay[0] <= sdi;   // asyncronous input
+    sdi_delay[0] <= sdi;      // asyncronous input
     sdi_delay[1] <= sdi_delay[0];
     clk          <= (count_clk == 0);
     link         <= (count_link != 0);  // show RX activity

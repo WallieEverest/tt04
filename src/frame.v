@@ -19,7 +19,7 @@ module frame #(
 ) /* synthesis syn_hier="fixed" */;
 
 localparam PRESCALE = CLKRATE/240;  // frame rate
-reg [12:0] prescaler = 0;  // size allows max system clock of 1.9 MHz
+reg [12:0] prescaler = 0 /* synthesis syn_preserve=1 */;  // size allows max system clock of 1.9 MHz
 reg divider = 0;
 
 // Cycle through 4-step sequence
