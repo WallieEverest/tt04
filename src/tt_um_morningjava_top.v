@@ -28,7 +28,8 @@ module tt_um_morningjava_top (
   assign uo_out[0] = pwm;
   assign uo_out[1] = blink;
   assign uo_out[2] = link;
-  assign uo_out[7:3] = 0;
+  assign uo_out[3] = rx;
+  assign uo_out[7:4] = 0;
   assign uio_out = 0;
   assign uio_oe = 0;
 
