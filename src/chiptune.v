@@ -10,16 +10,19 @@
 `default_nettype none
 
 module chiptune #(
-  parameter CLKRATE = 12_000_000,  // external oscillator
+  parameter OSCRATE = 12_000_000,  // external oscillator
   parameter BAUDRATE = 9600        // serial baud rate
 )(
-  input  wire osc,    // external oscillator
-  input  wire rst_n,  // asynchronous reset
-  input  wire rx,     // serial data
-  output wire pwm,    // audio PWM
-  output wire blink,  // status LED
-  output wire link    // link LED
+  input  wire osc,        // external oscillator
+  input  wire rst_n,      // asynchronous reset
+  input  wire rx,         // serial data
+  output wire pwm,        // audio PWM
+  output wire [3:0] dac,  // audio DAC
+  output wire blink,      // status LED
+  output wire link        // link LED
 ) /* synthesis syn_hier="fixed" */;
+
+  localparam CLKRATE = 1_790_000;  // number of bits in message
 
   wire clk;
   wire clk_uart;
@@ -32,6 +35,7 @@ module chiptune #(
   wire reg_change;
   wire [3:0] pulse_out;
   reg reset = 1 /* synthesis syn_preserve=1 */;
+  assign dac = pulse_out;
 
   // Synchronize external reset to clock
   always @(posedge clk) begin
@@ -42,13 +46,13 @@ module chiptune #(
   end
 
   prescaler #(
-    .OSCRATE(CLKRATE),    // oscillator frequency
-    .CLKRATE(1_790_000),  // system clock frequency
-    .BAUDRATE(BAUDRATE)   // baud rate
+    .OSCRATE(OSCRATE),    // oscillator frequency
+    .BAUDRATE(BAUDRATE),  // baud rate
+    .CLKRATE(1_790_000)   // system clock frequency
   ) prescaler_inst (
     .osc     (osc),       // system oscillator
     .rx      (rx),        // serial input for activity indicator
-    .clk     (clk),       // APU system clock, 1.79 MHz
+    .clk     (clk),       // APU system clock, ~1.79 MHz
     .clk_uart(clk_uart),  // 5x UART clock, 48 kHz
     .blink   (blink),     // 1 Hz blink indicator
     .link    (link)       // activity indicator

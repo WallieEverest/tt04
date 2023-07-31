@@ -56,8 +56,6 @@ Devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in two
 
 The audio portion of the project consists of two rectangular pulse generators. Each module is controlled by four 8-bit registers. Configurable parameters are the frequency, duty cycle, sweep, decay, and note duration.
 
-The frequency range of the project is limited by the legacy scanchain, but mid-range frequencies are acceptable. Additional triangle and noise modules will be added in future work when more bandwidth is available.
-
 ### ChipTune Pin Assignments
 | Signal     | Name     | Signal     | Name     |
 | ---------- | ---------| ---------- | ---------|

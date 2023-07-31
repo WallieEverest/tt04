@@ -12,8 +12,8 @@
 
 module prescaler #(
   parameter OSCRATE = 12_000_000,  // oscillator clock frequency
-  parameter CLKRATE = 1_790_000,   // system clock frequency
-  parameter BAUDRATE = 9600        // serial data rate
+  parameter BAUDRATE = 9600,       // serial data rate
+  parameter CLKRATE = 1_790_000    // system clock frequency
 )(
   input  wire osc,
   input  wire rx,
@@ -42,7 +42,7 @@ module prescaler #(
     sdi          <= rx_meta;  // align input to the system clock
     sdi_delay[0] <= sdi;      // asyncronous input
     sdi_delay[1] <= sdi_delay[0];
-    clk          <= (count_clk == 0);
+    clk          <= (count_clk < 3);  // extend clock duration
     link         <= (count_link != 0);  // show RX activity
 
     if (count_clk != 0)

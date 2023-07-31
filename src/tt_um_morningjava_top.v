@@ -6,6 +6,10 @@
 // License: Apache 2.0
 //
 // Description:
+//   Tiny Tapeout project for the Efabless Caravel device.
+//   Targets the SkyWater 130nm PDK.
+//   An external PWM low-pass filter is required below 5 kHz.
+//   The external serial COM port is set for 9600 baud.
 
 `default_nettype none
 
@@ -20,29 +24,34 @@ module tt_um_morningjava_top (
   output wire [7:0] uio_oe    // Bidirectional enable (active-high: 0=input, 1=output)
 );
 
+  localparam OSCRATE = 12_000_000;  // external oscillator
+  localparam BAUDRATE = 9600;       // serial baud rate
+
   wire pwm;
+  wire [3:0] dac;
   wire blink;
   wire link;
   wire rx = ui_in[0];
-  
+
   assign uo_out[0] = pwm;
   assign uo_out[1] = blink;
   assign uo_out[2] = link;
   assign uo_out[3] = rx;
-  assign uo_out[7:4] = 0;
+  assign uo_out[7:4] = dac;
   assign uio_out = 0;
   assign uio_oe = 0;
 
   chiptune #(
-    .CLKRATE(12_000_000),  // external oscillator
-    .BAUDRATE(9600)        // serial baud rate
+    .OSCRATE(OSCRATE),
+    .BAUDRATE(BAUDRATE)
   ) chiptune_inst (
     .osc  (clk),
     .rst_n(rst_n),
-    .rx   (rx),            // serial data input
-    .pwm  (pwm),           // audio PWM
-    .blink(blink),         // status LED
-    .link (link)           // link LED
+    .rx   (rx),     // serial data input
+    .pwm  (pwm),    // audio PWM
+    .dac  (dac),    // audio DAC
+    .blink(blink),  // status LED
+    .link (link)    // link LED
   );
 
 endmodule
