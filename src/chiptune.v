@@ -5,7 +5,8 @@
 // URL:     https://github.com/wallieeverest/tt04
 // License: Apache 2.0
 //
-// Description:
+// Description: The instructions set is similar to an enhanced 6502 with
+// a sound generator designated the RP2A03 found in some Nintendo products.
 
 `default_nettype none
 
@@ -22,7 +23,8 @@ module chiptune #(
   output wire link        // link LED
 ) /* synthesis syn_hier="fixed" */;
 
-  localparam CLKRATE = 1_790_000;  // number of bits in message
+  localparam CLKRATE = 1_790_000;  // APU system clock
+  // Note: [Heil and Zhao] mention 894 kHz instead, possibly with a differnt frame rate divider
 
   wire clk;
   wire clk_uart;
@@ -30,19 +32,27 @@ module chiptune #(
   wire [7:0] reg_4001;
   wire [7:0] reg_4002;
   wire [7:0] reg_4003;
+  wire [7:0] reg_4007;
+  wire [7:0] reg_4008;
+  wire [7:0] reg_400A;
+  wire [7:0] reg_400B;
   wire enable_240hz;  // 240 Hz
   wire enable_120hz;  // 120 Hz
   wire reg_change;
   wire [3:0] pulse_out;
-  reg reset = 1 /* synthesis syn_preserve=1 */;
+  reg reset /* synthesis syn_preserve=1 */;
+  reg reset_meta;
   assign dac = pulse_out;
 
   // Synchronize external reset to clock
   always @(posedge clk) begin
-    if (rst_n == 1)
-      reset <= 0;
-    else
-      reset <= 1;
+    if (rst_n == 0) begin
+      reset      <= 1;
+      reset_meta <= 1;
+    end else begin      
+      reset      <= reset_meta;
+      reset_meta <= 0;
+    end
   end
 
   prescaler #(
@@ -65,6 +75,10 @@ module chiptune #(
     .reg_4001  (reg_4001),
     .reg_4002  (reg_4002),
     .reg_4003  (reg_4003),
+    .reg_4007  (reg_4007),
+    .reg_4008  (reg_4008),
+    .reg_400A  (reg_400A),
+    .reg_400B  (reg_400B),
     .reg_change(reg_change)
   );
 

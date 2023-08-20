@@ -57,19 +57,19 @@ Devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in two
 The audio portion of the project consists of two rectangular pulse generators. Each module is controlled by four 8-bit registers. Configurable parameters are the frequency, duty cycle, sweep, decay, and note duration.
 
 ### ChipTune Pin Assignments
-| Signal     | Name     | Signal     | Name     |
-| ---------- | ---------| ---------- | ---------|
-| clk        | 12 MHz   | rst_n      | RESET_N  |
-| ena        | SPARE    | uio_oe[7]  | SPARE    |
-| ui_in[0]   | RX       | uo_out[0]  | PWM      |
-| ui_in[1]   | SPARE    | uo_out[1]  | BLINK    |
-| ui_in[2]   | SPARE    | uo_out[2]  | LINK     |
-| ui_in[3]   | SPARE    | uo_out[3]  | TX       |
-| ui_in[4]   | SPARE    | uo_out[4]  | SPARE    |
-| ui_in[5]   | SPARE    | uo_out[5]  | SPARE    |
-| ui_in[6]   | SPARE    | uo_out[6]  | SPARE    |
-| ui_in[7]   | SPARE    | uo_out[7]  | SPARE    |
-| uio_in[7]  | SPARE    | uio_out[7] | SPARE    |
+| Signal       | Name     | Signal       | Name     |
+| ------------ | ---------| ------------ | ---------|
+| clk          | 12 MHz   | ena          | SPARE    |
+| rst_n        | RESET_N  | uio_oe[7:0]  | SPARE    |
+| ui_in[0]     | SPARE    | uo_out[0]    | BLINK    |
+| ui_in[1]     | SPARE    | uo_out[1]    | LINK     |
+| ui_in[2]     | RX       | uo_out[2]    | TX       |
+| ui_in[3]     | SPARE    | uo_out[3]    | PWM      |
+| ui_in[4]     | SPARE    | uo_out[4]    | DAC[0]   |
+| ui_in[5]     | SPARE    | uo_out[5]    | DAC[1]   |
+| ui_in[6]     | SPARE    | uo_out[6]    | DAC[2]   |
+| ui_in[7]     | SPARE    | uo_out[7]    | DAC[3]   |
+| uio_in[7:0]  | SPARE    | uio_out[7:0] | SPARE    |
 
 ## Design For Test Considerations
 

@@ -18,8 +18,8 @@ module fpga_top (
   input  wire       dtrn,    // PIO_3[4], pin 3  (RS232_DTRn)
   input  wire       rx,      // PIO_3[8], pin 9  (RS232_RX)
   input  wire       rtsn,    // PIO_3[6], pin 7  (RS232_RTSn)
-  input  wire [7:0] i_data,  // PIO_0[9:2]       (J1, pullup)
-  output wire [7:0] o_data,  // PIO_1[9:2]       (PMOD)
+  input  wire [7:0] ui_in,   // PIO_0[9:2]       (J1, pullup)
+  output wire [7:0] uo_out,  // PIO_1[9:2]       (PMOD)
   output wire       tx,      // PIO_3[7], pin 8  (RS232_TX)
   output wire [4:0] led      // PIO_1[10:14]
 ) /* synthesis syn_hier="fixed" */;
@@ -37,10 +37,10 @@ module fpga_top (
   assign led[1] = link;      // D3, RX activity status
   assign led[2] = dtrn;      // D2, DTRn from COM
   assign led[3] = rtsn;      // D4, RTSn from COM
-  assign led[4] = (i_data == 8'hFF);  // D5, power (center green LED)
-  assign o_data[0] = pwm;    // PWM audio output
-  assign o_data[3:1] = 0;    // output pins from projects
-  assign o_data[7:4] = dac;  // output pins from projects
+  assign led[4] = (ui_in == 8'hFF);  // D5, power (center green LED)
+  assign uo_out[2:0] = 0;    // output pins from project
+  assign uo_out[3] = pwm;    // PWM audio output
+  assign uo_out[7:4] = dac;  // raw audio
   assign tx = rx;            // serial loop-back to host
 
   chiptune #(

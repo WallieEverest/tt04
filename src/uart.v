@@ -18,6 +18,10 @@ module uart (
   output reg  [7:0] reg_4001 = 0,
   output reg  [7:0] reg_4002 = 0,
   output reg  [7:0] reg_4003 = 0,
+  output reg  [7:0] reg_4007 = 0,
+  output reg  [7:0] reg_4008 = 0,
+  output reg  [7:0] reg_400A = 0,
+  output reg  [7:0] reg_400B = 0,
   output reg        reg_change = 0
 ) /* synthesis syn_hier="fixed" */;
 
@@ -30,10 +34,10 @@ module uart (
   reg [2:0] baud_count = 0 /* synthesis syn_preserve=1 */;
   reg rx_meta = 0;
   reg sdi = 0;
-  reg sck = 0;                         // recovered serial clock
-  reg  [WIDTH-1:0] shift = IDLE;       // default to IDLE pattern
-  wire [2:0] addr = shift[WIDTH-3:5];  // address is upper nibble
-  wire [3:0] data = shift[WIDTH-6:1];  // data is lower nibble
+  reg sck = 0;                   // recovered serial clock
+  reg  [WIDTH-1:0] shift = IDLE; // default to IDLE pattern
+  wire [3:0] addr = shift[8:5];  // address is upper nibble
+  wire [3:0] data = shift[4:1];  // data is lower nibble
   reg  [3:0] hold = 0;
   reg  [3:0] bit_count = 0;
   wire zero_count = (bit_count == 0);
@@ -68,13 +72,17 @@ module uart (
 
     if (msg_sync) begin // capture user inbound data
       hold <= data;     // hold first 4-bits and wait for remaining half
-      if (addr == 7)
+      if (addr == 7)  // DEBUG
         reg_change <= ~reg_change;  // toggle on register update
       case (addr)
         1:  reg_4000 <= {data, hold};
         3:  reg_4001 <= {data, hold};
         5:  reg_4002 <= {data, hold};
         7:  reg_4003 <= {data, hold};
+        9:  reg_4007 <= {data, hold};
+        11: reg_4008 <= {data, hold};
+        13: reg_400A <= {data, hold};
+        15: reg_400B <= {data, hold};
       endcase
     end
   end
