@@ -26,11 +26,12 @@ module a_tb_morning_java_top ();
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
   wire rx = message[0];
-  assign ui_in[0] = rx;
-  assign ui_in[7:1] = 0;
+  assign ui_in[2] = rx;
+  assign ui_in[7:3] = 0;
+  assign ui_in[1:0] = 0;
 
   tb_audio_pwm tb_audio_pwm_inst (
-    .pwm(uo_out[0])
+    .pwm(uo_out[3])
   );
 
   tt_um_morningjava_top dut (

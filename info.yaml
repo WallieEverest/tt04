@@ -6,7 +6,7 @@ project:
     - audio_pwm.v
     - frame.v
     - prescaler.v
-    - rectangle.v
+    - square.v
     - triangle.v
     - uart.v
     - chiptune.v

@@ -36,7 +36,7 @@ module tb_rectangle ();
     .fc_enable_120hz ( enable_120hz )
   );
   
-  rectangle rectangle_inst (
+  square square_inst (
     .clk          (clk),
     .enable_240hz (enable_240hz),
     .enable_120hz (enable_120hz),

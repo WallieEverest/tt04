@@ -1,11 +1,11 @@
-// Title:   Rectangule pulse generator
-// File:    rectangle.v
+// Title:   Rectangular pulse generator
+// File:    square.v
 // Author:  Wallace Everest
 // Date:    28-APR-2023
 // URL:     https://github.com/wallieeverest/tt04
 // License: Apache 2.0
 //
-// Description:
+// Description: (from apu_ref.txt and nesdev.org)
 // --------------
 // Square Channel
 // --------------
@@ -25,7 +25,7 @@
 
 `default_nettype none
 
-module rectangle (
+module square (
   input wire       clk,
   input wire       enable_240hz,
   input wire       enable_120hz,
@@ -39,14 +39,14 @@ module rectangle (
 
   // Input registers
   wire [ 3:0] decay_rate      = reg_4000[3:0];  // volume / decay rate
-  wire        decay_disable   = reg_4000[4];
-  wire        length_disable  = reg_4000[5];  // length disable / decay looping enable
+  wire        decay_halt      = reg_4000[4];
+  wire        length_halt     = reg_4000[5];  // length disable / decay looping enable
   wire [ 1:0] duty_cycle_type = reg_4000[7:6];
   wire [ 2:0] sweep_shift     = reg_4001[2:0];
   wire        sweep_decrement = reg_4001[3];
   wire [ 2:0] sweep_rate      = reg_4001[6:4];
   wire        sweep_enable    = reg_4001[7];
-  wire [10:0] wavelength      = {reg_4003[2:0], reg_4002};
+  wire [10:0] timer_preset      = {reg_4003[2:0], reg_4002};
   wire [ 4:0] length_select   = reg_4003[7:3];
   wire [ 3:0] volume;
   wire length_count_zero;
@@ -59,16 +59,16 @@ module rectangle (
   reg [ 1:0] reg_delay = 0;
   reg [ 7:0] length_counter = 0;
   reg [ 2:0] sweep_counter = 0;
-  reg [10:0] preset_timer = 0;
+  reg [10:0] timer_load = 0;
   reg [ 3:0] decay_counter = 0;
   reg [ 3:0] envelope_counter = 0;
-  reg [10:0] programmable_timer = 0;
+  reg [10:0] timer = 0;
   reg [ 2:0] index = 0;
   reg [ 7:0] length_preset;
   reg [ 7:0] duty_cycle_pattern;
 
   // Detect configuration change
-  always @( posedge clk ) begin
+  always @( posedge clk ) begin : square_reload
     reg_delay[0] <= reg_change;  // asynchronous input from clock crossing
     reg_delay[1] <= reg_delay[0];
     reload <= ( reg_delay[1] != reg_delay[0] );  // detect edge of toggle input
@@ -77,87 +77,92 @@ module rectangle (
   // Length counter
   assign length_count_zero = ( length_counter == 0 );
 
-  always @( posedge clk ) begin
-    if ( length_disable )
+  always @( posedge clk ) begin : square_length_couner
+    if ( length_halt ) begin
       length_counter <= 0;
-    else
+    end else begin
       if ( reload )
         length_counter <= length_preset;
-      else
-        if ( enable_120hz && !length_count_zero )
-          length_counter <= length_counter - 1;
+      else if ( enable_120hz && !length_count_zero )
+        length_counter <= length_counter - 1;
+    end
   end
 
   // Envelope unit
-  assign volume = decay_disable ? decay_rate : envelope_counter;
+  assign volume = decay_halt ? decay_rate : envelope_counter;
 
-  always @( posedge clk ) begin
+  always @( posedge clk ) begin : square_envelope_counter
     if ( reload ) begin
       decay_counter <= decay_rate;
       envelope_counter <= ~0;
-    end else 
-      if ( enable_240hz ) begin
-        if ( !decay_disable )
-          if ( decay_counter != 0 )
-            decay_counter <= decay_counter - 1;
-          else begin
-            decay_counter <= decay_rate;
-            if ( envelope_counter != 0 )
-              envelope_counter <= envelope_counter - 1;
-            else
-              if ( length_disable )  // enable decay looping
-                envelope_counter <= ~0;
-          end
-      end 
+    end else begin
+      if ( enable_240hz && !decay_halt ) begin
+        if ( decay_counter != 0 )
+          decay_counter <= decay_counter - 1;
+        else begin
+          decay_counter <= decay_rate;
+          if ( envelope_counter != 0 )
+            envelope_counter <= envelope_counter - 1;
+          else if ( length_halt )  // enable decay looping
+            envelope_counter <= ~0;
+        end
+      end
+    end
   end
 
   // Sweep unit
-  assign preset_decrement = {1'b0, preset_timer} - (wavelength >> sweep_shift);  // should be 1's compliment for CH1
-  assign preset_increment = {1'b0, preset_timer} + (wavelength >> sweep_shift);
-  assign preset_valid = (!preset_increment[11] && !preset_decrement[11] && (preset_timer[10:3] != 0) );
+  assign preset_decrement = {1'b0, timer_load} - (timer_preset >> sweep_shift);  // should be 1's compliment for CH1
+  assign preset_increment = {1'b0, timer_load} + (timer_preset >> sweep_shift);
+  assign preset_valid = (!preset_increment[11] && !preset_decrement[11] && (timer_load[10:3] != 0) );
   // DEBUG: Clock enable has priority over reload
-  always @( posedge clk ) begin
+  always @( posedge clk ) begin : square_sweep_counter
     if ( reload ) begin
       sweep_counter <= sweep_rate;
-      preset_timer <= wavelength;
-    end else 
+      timer_load <= timer_preset;
+    end else begin
       if ( enable_120hz ) begin
-        if ( sweep_counter != 0 ) 
+        if ( sweep_counter != 0 ) begin
           sweep_counter <= sweep_counter - 1;
-        else 
+        end else begin
           if ( sweep_enable ) begin
             sweep_counter <= sweep_rate;
             if ( sweep_decrement ) begin  // sweep up to higher frequencies
               if ( !preset_decrement[11] )  // check undeflow
-                preset_timer <= preset_decrement[10:0];
-            end else  // sweep down to lower frequencies
+                timer_load <= preset_decrement[10:0];
+            end else begin // sweep down to lower frequencies
               if ( !preset_increment[11] )  // check overflow
-                preset_timer <= preset_increment[10:0];
+                timer_load <= preset_increment[10:0];
+            end
           end
+        end
       end
+    end
   end
 
-  // Timer
-  always @( posedge clk ) begin  // originally at 1.79 MHz
-    timer_event <= ( programmable_timer == 0 );
-    if ( programmable_timer != 0 )
-      programmable_timer <= programmable_timer - 1;
-    else
-      programmable_timer <= preset_timer;
+  // Timer, ticks at 1.79 MHz / 2
+  always @( posedge clk ) begin : square_timer  // originally at 1.79 MHz
+    if ( timer == 0 ) begin
+      timer <= timer_load;  // DEBUG reduce effective clock rate
+      timer_event <= 1;
+    end else begin
+      timer <= timer - 1;
+      timer_event <= 0;
+    end
   end
 
   // Duty cycle
-  always @( posedge clk ) begin
-    if ( reload )
+  always @( posedge clk ) begin : square_duty_cycle
+    if ( reload ) begin
       index <= ~0;
-    else
-      if ( !length_count_zero && timer_event ) begin
+    end else begin
+      if ( timer_event && !length_count_zero ) begin
         index <= index - 1;
         if ( duty_cycle_pattern[index] && preset_valid)
           pulse_out <= volume;
         else
           pulse_out <= 0;  // was -volume
-      end 
+      end
+    end
   end
 
   always @*

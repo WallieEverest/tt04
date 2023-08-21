@@ -6,7 +6,7 @@
 // License: Apache 2.0
 //
 // Description: The instructions set is similar to an enhanced 6502 with
-// a sound generator designated the RP2A03 found in some Nintendo products.
+// an Audio Processing Unit (APU), designated the RP2A03 found in NTSC Nintendo consoles.
 
 `default_nettype none
 
@@ -40,6 +40,8 @@ module chiptune #(
   wire enable_120hz;  // 120 Hz
   wire reg_change;
   wire [3:0] pulse_out;
+  wire [3:0] tri_out;
+  wire [4:0] pwm_data;
   reg reset /* synthesis syn_preserve=1 */;
   reg reset_meta;
   assign dac = pulse_out;
@@ -90,7 +92,7 @@ module chiptune #(
     .enable_120hz(enable_120hz)
   );
   
-  rectangle rectangle_inst (
+  square square_inst (
     .clk         (clk),
     .enable_240hz(enable_240hz),
     .enable_120hz(enable_120hz),
@@ -102,12 +104,26 @@ module chiptune #(
     .pulse_out   (pulse_out)
   );
 
+  triangle triangle_inst (
+    .clk         (clk),
+    .enable_240hz(enable_240hz),
+    .enable_120hz(enable_120hz),
+    .reg_4008    (reg_4008),
+    .reg_400A    (reg_400A),
+    .reg_400B    (reg_400B),
+    .reg_change  (reg_change),
+    .tri_out     (tri_out)
+  );
+
+  // mixer
+  assign pwm_data = {1'b0, pulse_out} + {1'b0, tri_out};
+
   audio_pwm #(
-    .WIDTH(4)
+    .WIDTH(5)
   ) audio_pwm_inst (
     .clk  (clk),
     .reset(reset),
-    .data (pulse_out),
+    .data (pwm_data),
     .pwm  (pwm)
   );
 
