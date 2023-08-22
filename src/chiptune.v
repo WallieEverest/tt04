@@ -24,35 +24,32 @@ module chiptune #(
 ) /* synthesis syn_hier="fixed" */;
 
   localparam CLKRATE = 1_790_000;  // APU system clock
-  // Note: [Heil and Zhao] mention 894 kHz instead, possibly with a differnt frame rate divider
 
   wire clk;
   wire clk_uart;
-  wire [7:0] reg_4000;
-  wire [7:0] reg_4001;
-  wire [7:0] reg_4002;
-  wire [7:0] reg_4003;
-  wire [7:0] reg_4007;
-  wire [7:0] reg_4008;
-  wire [7:0] reg_400A;
-  wire [7:0] reg_400B;
   wire enable_240hz;  // 240 Hz
   wire enable_120hz;  // 120 Hz
-  wire reg_change;
-  wire [3:0] pulse_out;
+  wire [16*8-1:0] reg_data;
+  wire [7:0] reg_array [0:15];
+  wire [3:0] reg_event;
+  wire [3:0] pulse1_out;
+  wire [3:0] pulse2_out;
   wire [3:0] tri_out;
-  wire [4:0] pwm_data;
+  wire [5:0] pwm_data;
   reg reset /* synthesis syn_preserve=1 */;
   reg reset_meta;
-  assign dac = pulse_out;
+  assign dac = pwm_data[5:2];
+
+  genvar i;
+  for (i=0; i<=15; i=i+1) assign reg_array[i] = reg_data[8*i+7:8*i];
 
   // Synchronize external reset to clock
   always @(posedge clk) begin
     if (rst_n == 0) begin
-      reset      <= 1;
+      reset <= 1;
       reset_meta <= 1;
     end else begin      
-      reset      <= reset_meta;
+      reset <= reset_meta;
       reset_meta <= 0;
     end
   end
@@ -71,17 +68,10 @@ module chiptune #(
   );
 
   uart uart_inst (
-    .clk       (clk_uart),
-    .rx        (rx),
-    .reg_4000  (reg_4000),
-    .reg_4001  (reg_4001),
-    .reg_4002  (reg_4002),
-    .reg_4003  (reg_4003),
-    .reg_4007  (reg_4007),
-    .reg_4008  (reg_4008),
-    .reg_400A  (reg_400A),
-    .reg_400B  (reg_400B),
-    .reg_change(reg_change)
+    .clk      (clk_uart),
+    .rx       (rx),
+    .reg_data (reg_data),
+    .reg_event(reg_event)
   );
 
   frame #(
@@ -92,34 +82,47 @@ module chiptune #(
     .enable_120hz(enable_120hz)
   );
   
-  square square_inst (
+  square square1_inst (
     .clk         (clk),
     .enable_240hz(enable_240hz),
     .enable_120hz(enable_120hz),
-    .reg_4000    (reg_4000),
-    .reg_4001    (reg_4001),
-    .reg_4002    (reg_4002),
-    .reg_4003    (reg_4003),
-    .reg_change  (reg_change),
-    .pulse_out   (pulse_out)
+    .reg_4000    (reg_array[4'h0]),
+    .reg_4001    (reg_array[4'h1]),
+    .reg_4002    (reg_array[4'h2]),
+    .reg_4003    (reg_array[4'h3]),
+    .reg_change  (reg_event[0]),
+    .pulse_out   (pulse1_out)
+  );
+
+  square square2_inst (
+    .clk         (clk),
+    .enable_240hz(enable_240hz),
+    .enable_120hz(enable_120hz),
+    .reg_4000    (reg_array[4'h4]),
+    .reg_4001    (reg_array[4'h5]),
+    .reg_4002    (reg_array[4'h6]),
+    .reg_4003    (reg_array[4'h7]),
+    .reg_change  (reg_event[1]),
+    .pulse_out   (pulse2_out)
   );
 
   triangle triangle_inst (
     .clk         (clk),
     .enable_240hz(enable_240hz),
-    .enable_120hz(enable_120hz),
-    .reg_4008    (reg_4008),
-    .reg_400A    (reg_400A),
-    .reg_400B    (reg_400B),
-    .reg_change  (reg_change),
+    .reg_4008    (reg_array[4'h8]),
+    .reg_400A    (reg_array[4'hA]),
+    .reg_400B    (reg_array[4'hB]),
+    .reg_change  (reg_event[2]),
     .tri_out     (tri_out)
   );
 
+  // noise generator
+
   // mixer
-  assign pwm_data = {1'b0, pulse_out} + {1'b0, tri_out};
+  assign pwm_data = {2'b00, pulse1_out} + {2'b00, pulse2_out} + {2'b00, tri_out};
 
   audio_pwm #(
-    .WIDTH(5)
+    .WIDTH(6)
   ) audio_pwm_inst (
     .clk  (clk),
     .reset(reset),

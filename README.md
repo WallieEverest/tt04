@@ -10,6 +10,12 @@ This project is an audio device that replicates the square-wave sound generators
 
 Devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in two package options, each with 64 pins. TinyTapeout 4 will be packaged in the QFN variant, mounted on a daughterboard for breakout.
 
+Based on data from:
+    
+https://github.com/efabless/caravel_board/blob/main/hardware/breakout/caravel-M.2-card-QFN/caravel-M.2-card-QFN.pdf
+    
+https://github.com/psychogenic/caravel-breakout-pcb/tree/main/breakout-qfn
+
 ### MPRJ_IO Pin Assignments
 | Signal      | Name                          | Dir | WCSP | QFN | PCB   |
 | ----------- | ----------------------------- |---- |----- |---- |------ |

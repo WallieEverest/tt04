@@ -6,32 +6,15 @@
 // License: Apache 2.0
 //
 // Description: (from apu_ref.txt and nesdev.org)
-// ----------------
-// Triangle Channel
-// ----------------
-
-//                    +---------+    +---------+
-//                    |LinearCtr|    | Length  |
-//                    +---------+    +---------+
-//                         |              |
-//                         v              v
-//     +---------+        |\             |\         +---------+    +---------+ 
-//     |  Timer  |------->| >----------->| >------->|Sequencer|--->|   DAC   |
-//     +---------+        |/             |/         +---------+    +---------+ 
-
 // The triangle channel contains the following: Timer, 32-step sequencer, Length
 // Counter, Linear Counter, 4-bit DAC.
-
 // $4008: length counter disable, linear counter
 // $400A: period low
 // $400B: length counter reload, period high
 // When the timer generates a clock and the Length Counter and Linear Counter both
 // have a non-zero count, the sequencer is clocked.
-
 // The sequencer feeds the following repeating 32-step sequence to the DAC:
-
 //     F E D C B A 9 8 7 6 5 4 3 2 1 0 0 1 2 3 4 5 6 7 8 9 A B C D E F
-
 // At the lowest two periods ($400B = 0 and $400A = 0 or 1), the resulting
 // frequency is so high that the DAC effectively outputs a value half way between
 // 7 and 8.
@@ -40,14 +23,12 @@
 //             |                |
 //             v                v
 // Timer ---> Gate ----------> Gate ---> Sequencer ---> (to mixer)
-// timer, length counter, linear counter, linear counter reload flag, control flag, sequencer.
 
 `default_nettype none
 
 module triangle (
   input wire       clk,
   input wire       enable_240hz,
-  input wire       enable_120hz,
   input wire [7:0] reg_4008,
   input wire [7:0] reg_400A,
   input wire [7:0] reg_400B,

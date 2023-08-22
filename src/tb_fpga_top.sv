@@ -62,6 +62,10 @@ module a_tb_fpga_top ();
   initial begin
     repeat (2) @(negedge sck);
     
+    // Set Bank 0
+    message = {STOP,8'h80,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
     // SMBDIS.ASM
     // PlayBigJump:
     //  lda #$18
