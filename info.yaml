@@ -5,6 +5,7 @@ project:
   source_files:
     - audio_pwm.v
     - frame.v
+    - noise.v
     - prescaler.v
     - square.v
     - triangle.v

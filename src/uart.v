@@ -64,37 +64,37 @@ module uart (
   wire zero_count = (bit_count == 0);
   wire msg_sync = (shift[WIDTH-1] == STOP) && (shift[0] == START) && zero_count;  // valid message
 
-  always @(posedge clk) begin : uart_serial_clock
+  always @( posedge clk ) begin : uart_serial_clock
     rx_meta <= rx;       // capture asynchronous input
     sdi     <= rx_meta;  // generate delay to detect edge
 
-    if (sdi != rx_meta) begin // edge detected
+    if ( sdi != rx_meta ) begin // edge detected
       baud_count <= 0;   // synchronize bit clock with phase offset
     end else begin
-      if (baud_count < BAUD_DIV-1)
+      if ( baud_count < BAUD_DIV-1 )
         baud_count <= baud_count+1;
       else
         baud_count <= 0;
     end
 
-    if (baud_count < BAUD_DIV/2)
+    if ( baud_count < BAUD_DIV/2 )
       sck <= 0;  // generate falling edge of SCK on RX change
     else
       sck <= 1;  // generate rising edge of SCK midway through bit period
   end
 
-  always @(posedge sck) begin : uart_serial_shift
+  always @( posedge sck ) begin : uart_serial_shift
     shift <= {sdi, shift[WIDTH-1:1]};  // right-shift and get next SDI bit
 
     if ( zero_count )
       bit_count <= WIDTH-1;
-    else if ( (shift[WIDTH-1] == START) || (bit_count != WIDTH-1) )  // synchronize with IDLE pattern
+    else if ( ( shift[WIDTH-1] == START ) || ( bit_count != WIDTH-1 ) )  // synchronize with IDLE pattern
       bit_count <= bit_count - 1;
   end
 
-  always @(posedge sck) begin : uart_decode
-    if (msg_sync) begin  // capture user inbound data
-      if (bank)
+  always @( posedge sck ) begin : uart_decode
+    if ( msg_sync ) begin  // capture user inbound data
+      if ( bank )
         bank_select <= data[1:0];  // select register bank
       else begin
         reg_data[4*reg_select+0] <= data[0];  // data nibble of register
@@ -104,7 +104,7 @@ module uart (
       end
     end
 
-    if (msg_sync && !bank && (addr == 7))  // event for high-order register in bank
+    if ( msg_sync && !bank && ( addr == 7 ) )  // event for high-order register in bank
       reg_event <= 4'h1 << bank_select;
     else
       reg_event <= 4'h0;

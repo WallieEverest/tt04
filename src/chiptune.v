@@ -35,6 +35,7 @@ module chiptune #(
   wire [3:0] pulse1_out;
   wire [3:0] pulse2_out;
   wire [3:0] tri_out;
+  wire [3:0] noise_out;
   wire [5:0] pwm_data;
   reg reset /* synthesis syn_preserve=1 */;
   reg reset_meta;
@@ -116,10 +117,21 @@ module chiptune #(
     .tri_out     (tri_out)
   );
 
-  // noise generator
+  noise noise_inst (
+    .clk         (clk),
+    .enable_240hz(enable_240hz),
+    .reg_400C    (reg_array[4'hC]),
+    .reg_400E    (reg_array[4'hE]),
+    .reg_400F    (reg_array[4'hF]),
+    .reg_change  (reg_event[3]),
+    .noise_out   (noise_out)
+  );
 
-  // mixer
-  assign pwm_data = {2'b00, pulse1_out} + {2'b00, pulse2_out} + {2'b00, tri_out};
+  // Mixer
+  assign pwm_data = {2'b00, pulse1_out}
+                  + {2'b00, pulse2_out}
+                  + {2'b00, tri_out}
+                  + {2'b00, noise_out};
 
   audio_pwm #(
     .WIDTH(6)

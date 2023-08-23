@@ -75,12 +75,10 @@ module triangle (
 
   // Linear counter
   always @( posedge clk ) begin : triangle_linear_counter
-    if ( enable_240hz ) begin
-      if ( length_halt )  // linear in control
-        linear_counter <= linear_preset;
-      else if ( !linear_count_zero ) 
-        linear_counter <= linear_counter - 1;
-    end
+    if ( linear_reload || ( enable_240hz && linear_count_zero && length_halt ))
+      linear_counter <= linear_preset;
+    else if ( enable_240hz && !linear_count_zero ) 
+      linear_counter <= linear_counter - 1;
   end
 
   // Length counter
@@ -101,13 +99,11 @@ module triangle (
 
   // Timer, ticks at 1.79 MHz
   always @( posedge clk ) begin : triangle_timer
-    if ( timer_count_zero ) begin
+    timer_event <= timer_count_zero;
+    if ( timer_count_zero )
       timer <= timer_preset;
-      timer_event <= 1;
-    end else begin
+    else
       timer <= timer - 1;
-      timer_event <= 0;
-    end
   end
 
   // Sequencer
