@@ -96,26 +96,6 @@ module triangle (
       end
     end
   end
-
-  // Timer, ticks at 1.79 MHz
-  always @( posedge clk ) begin : triangle_timer
-    timer_event <= timer_count_zero;
-    if ( timer_count_zero )
-      timer <= timer_preset;
-    else
-      timer <= timer - 1;
-  end
-
-  // Sequencer
-  always @( posedge clk ) begin : triangle_sequencer
-    if ( !sequencer[4] )
-      tri_out <= ~sequencer[3:0];  // count down for first half of sequencer count
-    else
-      tri_out <= sequencer[3:0];  // count up for second half of sequencer count
-
-    if ( timer_event && !linear_count_zero && !length_count_zero )  // DEBUG nasty logic width
-      sequencer <= sequencer + 1;
-  end
   
   always @* begin
     case ( length_select )
@@ -152,6 +132,26 @@ module triangle (
       30: length_preset = 8'h20;
       31: length_preset = 8'h1E;
     endcase
+  end
+
+  // Timer, ticks at 1.79 MHz
+  always @( posedge clk ) begin : triangle_timer
+    timer_event <= timer_count_zero;
+    if ( timer_count_zero )
+      timer <= timer_preset;
+    else
+      timer <= timer - 1;
+  end
+
+  // Sequencer
+  always @( posedge clk ) begin : triangle_sequencer
+    if ( !sequencer[4] )
+      tri_out <= ~sequencer[3:0];  // count down for first half of sequencer count
+    else
+      tri_out <= sequencer[3:0];  // count up for second half of sequencer count
+
+    if ( timer_event && !linear_count_zero && !length_count_zero )  // DEBUG nasty logic width
+      sequencer <= sequencer + 1;
   end
 
 endmodule

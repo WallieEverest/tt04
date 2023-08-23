@@ -87,7 +87,45 @@ module square (
         length_counter <= length_counter - 1;
     end
   end
-
+  
+  always @*  // shifted left to count at 60 Hz
+  begin
+    case ( length_select )
+       0: length_preset = 8'h0A;
+       1: length_preset = 8'hFE;
+       2: length_preset = 8'h14;
+       3: length_preset = 8'h02;
+       4: length_preset = 8'h28;
+       5: length_preset = 8'h04;
+       6: length_preset = 8'h50;
+       7: length_preset = 8'h06;
+       8: length_preset = 8'hA0;
+       9: length_preset = 8'h08;
+      10: length_preset = 8'h3C;
+      11: length_preset = 8'h0A;
+      12: length_preset = 8'h0E;
+      13: length_preset = 8'h0C;
+      14: length_preset = 8'h1A;
+      15: length_preset = 8'h0E;
+      16: length_preset = 8'h0C;
+      17: length_preset = 8'h10;
+      18: length_preset = 8'h18;
+      19: length_preset = 8'h12;
+      20: length_preset = 8'h30;
+      21: length_preset = 8'h14;
+      22: length_preset = 8'h60;
+      23: length_preset = 8'h16;
+      24: length_preset = 8'hC0;
+      25: length_preset = 8'h18;
+      26: length_preset = 8'h48;
+      27: length_preset = 8'h1A;
+      28: length_preset = 8'h10;
+      29: length_preset = 8'h1C;
+      30: length_preset = 8'h20;
+      31: length_preset = 8'h1E;
+    endcase
+  end
+  
   // Envelope unit
   assign volume = decay_halt ? decay_rate : envelope_counter;
 
@@ -172,44 +210,6 @@ module square (
       1: duty_cycle_pattern = 8'b00000110;
       2: duty_cycle_pattern = 8'b00011110;
       3: duty_cycle_pattern = 8'b11111001;
-    endcase
-  end
-  
-  always @*  // shifted left to count at 60 Hz
-  begin
-    case ( length_select )
-       0: length_preset = 8'h0A;
-       1: length_preset = 8'hFE;
-       2: length_preset = 8'h14;
-       3: length_preset = 8'h02;
-       4: length_preset = 8'h28;
-       5: length_preset = 8'h04;
-       6: length_preset = 8'h50;
-       7: length_preset = 8'h06;
-       8: length_preset = 8'hA0;
-       9: length_preset = 8'h08;
-      10: length_preset = 8'h3C;
-      11: length_preset = 8'h0A;
-      12: length_preset = 8'h0E;
-      13: length_preset = 8'h0C;
-      14: length_preset = 8'h1A;
-      15: length_preset = 8'h0E;
-      16: length_preset = 8'h0C;
-      17: length_preset = 8'h10;
-      18: length_preset = 8'h18;
-      19: length_preset = 8'h12;
-      20: length_preset = 8'h30;
-      21: length_preset = 8'h14;
-      22: length_preset = 8'h60;
-      23: length_preset = 8'h16;
-      24: length_preset = 8'hC0;
-      25: length_preset = 8'h18;
-      26: length_preset = 8'h48;
-      27: length_preset = 8'h1A;
-      28: length_preset = 8'h10;
-      29: length_preset = 8'h1C;
-      30: length_preset = 8'h20;
-      31: length_preset = 8'h1E;
     endcase
   end
 

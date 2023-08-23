@@ -38,16 +38,17 @@ module noise (
   wire        length_halt      = reg_400C[5];
   wire [ 3:0] timer_select     = reg_400E[3:0];
   wire        mode_flag        = reg_400E[7];
-  wire [ 4:0] length_preset    = reg_400F[7:3];
+  wire [ 4:0] length_select    = reg_400F[7:3];
 
   reg [14:0] shift_register = 0;
-  reg [ 4:0] length_counter = 0;
+  reg [ 7:0] length_counter = 0;
   reg [11:0] timer_preset;
   reg [11:0] timer = 0;
   reg        timer_event = 0;
   reg [1:0]  reg_delay = 0;
   reg        reload = 0;
-  
+  reg [ 7:0] length_preset;
+
   wire length_count_zero    = ( length_counter == 0 );
   wire timer_count_zero     = ( timer == 0 );
   wire feedback = mode_flag ? (shift_register[6] ^ shift_register[0]) : (shift_register[1] ^ shift_register[0]);
@@ -75,6 +76,43 @@ module noise (
       length_counter <= length_counter - 1;
   end
 
+  always @* begin
+    case ( length_select )
+       0: length_preset = 8'h0A;
+       1: length_preset = 8'hFE;
+       2: length_preset = 8'h14;
+       3: length_preset = 8'h02;
+       4: length_preset = 8'h28;
+       5: length_preset = 8'h04;
+       6: length_preset = 8'h50;
+       7: length_preset = 8'h06;
+       8: length_preset = 8'hA0;
+       9: length_preset = 8'h08;
+      10: length_preset = 8'h3C;
+      11: length_preset = 8'h0A;
+      12: length_preset = 8'h0E;
+      13: length_preset = 8'h0C;
+      14: length_preset = 8'h1A;
+      15: length_preset = 8'h0E;
+      16: length_preset = 8'h0C;
+      17: length_preset = 8'h10;
+      18: length_preset = 8'h18;
+      19: length_preset = 8'h12;
+      20: length_preset = 8'h30;
+      21: length_preset = 8'h14;
+      22: length_preset = 8'h60;
+      23: length_preset = 8'h16;
+      24: length_preset = 8'hC0;
+      25: length_preset = 8'h18;
+      26: length_preset = 8'h48;
+      27: length_preset = 8'h1A;
+      28: length_preset = 8'h10;
+      29: length_preset = 8'h1C;
+      30: length_preset = 8'h20;
+      31: length_preset = 8'h1E;
+    endcase
+  end
+
   // Timer, ticks at 1.79 MHz
   always @( posedge clk ) begin : noise_timer
     timer_event <= timer_count_zero;
@@ -84,14 +122,6 @@ module noise (
       timer <= timer - 1;
   end
 
-  // Envelope
-  always @( posedge clk ) begin : noise_envelope
-    if ( length_count_zero || shift_register[0] )
-      noise_out <= 0;
-    else
-      noise_out <= envelope;  // volume
-  end
-  
   always @* begin
     case ( timer_select )
       0:  timer_preset = 12'h004;
@@ -111,6 +141,14 @@ module noise (
       14: timer_preset = 12'h7F2;
       15: timer_preset = 12'hFE4;
     endcase
+  end
+
+  // Envelope
+  always @( posedge clk ) begin : noise_envelope
+    if ( length_count_zero || shift_register[0] )
+      noise_out <= 0;
+    else
+      noise_out <= envelope;  // volume
   end
 
 endmodule
