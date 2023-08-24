@@ -7,6 +7,7 @@ project:
     - frame.v
     - noise.v
     - prescaler.v
+    - registers.v
     - square.v
     - triangle.v
     - uart.v

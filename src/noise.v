@@ -28,7 +28,7 @@ module noise (
   input wire [7:0] reg_400C,
   input wire [7:0] reg_400E,
   input wire [7:0] reg_400F,
-  input wire       reg_change,
+  input wire       reg_event,
   output reg [3:0] noise_out = 0
 );
 
@@ -45,8 +45,8 @@ module noise (
   reg [11:0] timer_preset;
   reg [11:0] timer = 0;
   reg        timer_event = 0;
-  reg [1:0]  reg_delay = 0;
-  reg        reload = 0;
+  // reg [1:0]  reg_delay = 0;
+  // reg        reload = 0;
   reg [ 7:0] length_preset;
 
   wire length_count_zero    = ( length_counter == 0 );
@@ -54,11 +54,11 @@ module noise (
   wire feedback = mode_flag ? (shift_register[6] ^ shift_register[0]) : (shift_register[1] ^ shift_register[0]);
 
   // Detect configuration change on $400F
-  always @( posedge clk ) begin : noise_reload
-    reg_delay[0] <= reg_change;  // asynchronous input from clock crossing
-    reg_delay[1] <= reg_delay[0];
-    reload <= ( reg_delay[1] != reg_delay[0] );  // detect edge of toggle input
-  end
+  // always @( posedge clk ) begin : noise_reload
+  //   reg_delay[0] <= reg_change;  // asynchronous input from clock crossing
+  //   reg_delay[1] <= reg_delay[0];
+  //   reload <= ( reg_delay[1] != reg_delay[0] );  // detect edge of toggle input
+  // end
 
   // Linear Feedback Shift Register
   always @( posedge clk ) begin : noise_lfsr
@@ -70,7 +70,7 @@ module noise (
 
   // Length counter
   always @( posedge clk ) begin : noise_length_counter
-    if ( reload )
+    if ( reg_event )
       length_counter <= length_preset;
     else if ( enable_240hz && !length_count_zero && !length_halt )
       length_counter <= length_counter - 1;

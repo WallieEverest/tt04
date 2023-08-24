@@ -33,7 +33,7 @@ module square (
   input wire [7:0] reg_4001,
   input wire [7:0] reg_4002,
   input wire [7:0] reg_4003,
-  input wire       reg_change,
+  input wire       reg_event,
   output reg [3:0] pulse_out = 0
 );
 
@@ -55,8 +55,8 @@ module square (
   wire preset_valid;
 
   reg timer_event = 0;
-  reg reload = 0;
-  reg [ 1:0] reg_delay = 0;
+  //reg reload = 0;
+  //reg [ 1:0] reg_delay = 0;
   reg [ 7:0] length_counter = 0;
   reg [ 2:0] sweep_counter = 0;
   reg [10:0] timer_load = 0;
@@ -68,11 +68,11 @@ module square (
   reg [ 7:0] duty_cycle_pattern;
 
   // Detect configuration change
-  always @( posedge clk ) begin : square_reload
-    reg_delay[0] <= reg_change;  // asynchronous input from clock crossing
-    reg_delay[1] <= reg_delay[0];
-    reload <= ( reg_delay[1] != reg_delay[0] );  // detect edge of toggle input
-  end
+  // always @( posedge clk ) begin : square_reload
+  //   reg_delay[0] <= reg_change;  // asynchronous input from clock crossing
+  //   reg_delay[1] <= reg_delay[0];
+  //   reload <= ( reg_delay[1] != reg_delay[0] );  // detect edge of toggle input
+  // end
 
   // Length counter
   assign length_count_zero = ( length_counter == 0 );
@@ -81,7 +81,7 @@ module square (
     if ( length_halt ) begin
       length_counter <= 0;
     end else begin
-      if ( reload )
+      if ( reg_event )
         length_counter <= length_preset;
       else if ( enable_120hz && !length_count_zero )
         length_counter <= length_counter - 1;
@@ -130,7 +130,7 @@ module square (
   assign volume = decay_halt ? decay_rate : envelope_counter;
 
   always @( posedge clk ) begin : square_envelope_counter
-    if ( reload ) begin
+    if ( reg_event ) begin
       decay_counter <= decay_rate;
       envelope_counter <= ~0;
     end else begin
@@ -154,7 +154,7 @@ module square (
   assign preset_valid = (!preset_increment[11] && !preset_decrement[11] && (timer_load[10:3] != 0) );
   // DEBUG: Clock enable has priority over reload
   always @( posedge clk ) begin : square_sweep_counter
-    if ( reload ) begin
+    if ( reg_event ) begin
       sweep_counter <= sweep_rate;
       timer_load <= timer_preset;
     end else begin
@@ -190,7 +190,7 @@ module square (
 
   // Duty cycle
   always @( posedge clk ) begin : square_duty_cycle
-    if ( reload ) begin
+    if ( reg_event ) begin
       index <= ~0;
     end else begin
       if ( timer_event && !length_count_zero ) begin

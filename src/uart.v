@@ -6,42 +6,17 @@
 // License: Apache 2.0
 //
 // Description:
-//   Uses Verilog-2001 array features
-//
 //   Recovers a bit clock (sck) from asynchronous serial data.
 //   A reference clock must be supplied at 5x the baud rate
-//   Decodes serial bytes onto a register array
-//
-//   Byte format
-//   Bit Description
-//    7  Bank
-//    6  Addr[2]
-//    5  Addr[1]
-//    4  Addr[0]
-//    3  Data[3]
-//    2  Data[2]
-//    1  Data[1]
-//    0  Data[0]
-//
-//   The 16 byte register array is configured as four banks of four registers each.
-//   When (Bank=1), the bank select register is set to Data[1:0]
-//   When (Bank=0), the data register addressed by {Bank[1:0], Addr[2:0]} is set to Data[3:0]
-//   A write event is posted for the high-order register in each bank
-//
-//   Example
-//   8'h82 selects bank 2
-//   8'h6F sets the lower nibble of bank 2, register 3 to the value 4'hF
-//   8'h7A sets the upper nibble of bank 2, register 3 to the value 4'hA
-//   reg_data[8] = 8'hAF
-//   reg_event[2] = 1 for one serial-clock period
 
 `default_nettype none
 
 module uart (
-  input  wire clk,  // 5x baud clock
-  input  wire rx,   // asynchronous serial input
-  output reg [16*8-1:0] reg_data = 0,  // flattened array of 16 bytes (128 bits)
-  output reg  [3:0] reg_event = 0
+  input  wire clk,                  // 5x baud clock
+  input  wire rx,                   // asynchronous serial input
+  output reg  [4:0] uart_addr = 0,  // serial address
+  output reg  [3:0] uart_data = 0,  // serial data
+  output reg  uart_ready = 0        // data ready
 );
 
   localparam [2:0] BAUD_DIV = 5;
@@ -93,20 +68,14 @@ module uart (
   end
 
   always @( posedge sck ) begin : uart_decode
+    uart_ready <= ( msg_sync && !bank );
     if ( msg_sync ) begin  // capture user inbound data
-      if ( bank )
+      if ( bank ) begin
         bank_select <= data[1:0];  // select register bank
-      else begin
-        reg_data[4*reg_select+0] <= data[0];  // data nibble of register
-        reg_data[4*reg_select+1] <= data[1];
-        reg_data[4*reg_select+2] <= data[2];
-        reg_data[4*reg_select+3] <= data[3];
+      end else begin
+        uart_addr  <= reg_select;
+        uart_data  <= data;
       end
     end
-
-    if ( msg_sync && !bank && ( addr == 7 ) )  // event for high-order register in bank
-      reg_event <= 4'h1 << bank_select;
-    else
-      reg_event <= 4'h0;
   end
 endmodule

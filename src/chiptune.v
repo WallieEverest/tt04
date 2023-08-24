@@ -37,6 +37,9 @@ module chiptune #(
   wire [3:0] tri_out;
   wire [3:0] noise_out;
   wire [5:0] pwm_data;
+  wire [4:0] uart_addr;
+  wire [3:0] uart_data;
+  wire uart_ready;
   reg reset /* synthesis syn_preserve=1 */;
   reg reset_meta;
 
@@ -59,10 +62,11 @@ module chiptune #(
 
   // *** UART Clock Domain ***
   uart uart_inst (
-    .clk      (uart_clk),
-    .rx       (rx),
-    .reg_data (reg_data),
-    .reg_event(reg_event)
+    .clk       (uart_clk),
+    .rx        (rx),
+    .uart_addr (uart_addr),
+    .uart_data (uart_data),
+    .uart_ready(uart_ready)
   );
 
   // *** APU Clock Domain ***
@@ -76,6 +80,15 @@ module chiptune #(
       reset_meta <= 0;
     end
   end
+
+  registers registers_inst (
+    .clk       (apu_clk),
+    .uart_addr (uart_addr),
+    .uart_data (uart_data),
+    .uart_ready(uart_ready),
+    .reg_data  (reg_data),
+    .reg_event (reg_event)
+  );
 
   frame #(
     .CLKRATE(CLKRATE)
@@ -93,7 +106,7 @@ module chiptune #(
     .reg_4001    (reg_array[4'h1]),
     .reg_4002    (reg_array[4'h2]),
     .reg_4003    (reg_array[4'h3]),
-    .reg_change  (reg_event[0]),
+    .reg_event   (reg_event[0]),
     .pulse_out   (pulse1_out)
   );
 
@@ -105,7 +118,7 @@ module chiptune #(
     .reg_4001    (reg_array[4'h5]),
     .reg_4002    (reg_array[4'h6]),
     .reg_4003    (reg_array[4'h7]),
-    .reg_change  (reg_event[1]),
+    .reg_event   (reg_event[1]),
     .pulse_out   (pulse2_out)
   );
 
@@ -115,7 +128,7 @@ module chiptune #(
     .reg_4008    (reg_array[4'h8]),
     .reg_400A    (reg_array[4'hA]),
     .reg_400B    (reg_array[4'hB]),
-    .reg_change  (reg_event[2]),
+    .reg_event   (reg_event[2]),
     .tri_out     (tri_out)
   );
 
@@ -125,7 +138,7 @@ module chiptune #(
     .reg_400C    (reg_array[4'hC]),
     .reg_400E    (reg_array[4'hE]),
     .reg_400F    (reg_array[4'hF]),
-    .reg_change  (reg_event[3]),
+    .reg_event   (reg_event[3]),
     .noise_out   (noise_out)
   );
 

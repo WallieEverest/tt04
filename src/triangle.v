@@ -32,7 +32,7 @@ module triangle (
   input wire [7:0] reg_4008,
   input wire [7:0] reg_400A,
   input wire [7:0] reg_400B,
-  input wire       reg_change,
+  input wire       reg_event,
   output reg [3:0] tri_out = 0
 );
 
@@ -50,8 +50,8 @@ module triangle (
   reg        linear_reload = 0;
   reg        timer_event = 0;
   reg        length_halt = 0;
-  reg [1:0]  reg_delay = 0;
-  reg        reload = 0;
+  // reg [1:0]  reg_delay = 0;
+  // reg        reload = 0;
   
   wire linear_count_zero    = ( linear_counter == 0 );
   wire length_count_zero    = ( length_counter == 0 );
@@ -59,15 +59,15 @@ module triangle (
   wire sequencer_count_zero = ( sequencer == 0 );
 
   // Detect configuration change on $400B
-  always @( posedge clk ) begin : triangle_reload
-    reg_delay[0] <= reg_change;  // asynchronous input from clock crossing
-    reg_delay[1] <= reg_delay[0];
-    reload <= ( reg_delay[1] != reg_delay[0] );  // detect edge of toggle input
-  end
+  // always @( posedge clk ) begin : triangle_reload
+  //   reg_delay[0] <= reg_change;  // asynchronous input from clock crossing
+  //   reg_delay[1] <= reg_delay[0];
+  //   reload <= ( reg_delay[1] != reg_delay[0] );  // detect edge of toggle input
+  // end
 
   // Select active counter
   always @( posedge clk ) begin : triangle_counter_select
-    if ( reload )
+    if ( reg_event )
       length_halt <= 1;
     else if ( enable_240hz )
       length_halt <= linear_control;
@@ -83,7 +83,7 @@ module triangle (
 
   // Length counter
   always @( posedge clk ) begin : triangle_length_counter
-    if ( reload ) begin
+    if ( reg_event ) begin
       length_counter <= length_preset;
     end else begin
       if ( !length_halt ) begin  // suspend while linear is in control

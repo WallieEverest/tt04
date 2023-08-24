@@ -14,8 +14,8 @@ module frame #(
   parameter CLKRATE = 1_790_000  // system clock rate
 )(
   input  wire clk,               // system clock
-  output reg enable_240hz = 0,   // 240 Hz
-  output reg enable_120hz = 0    // 120 Hz
+  output reg  enable_240hz = 0,   // 240 Hz
+  output reg  enable_120hz = 0    // 120 Hz
 );
 
 localparam PRESCALE = CLKRATE/240;  // frame rate
