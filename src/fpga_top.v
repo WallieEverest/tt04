@@ -10,6 +10,7 @@
 //   Targets a Lattice iCEstick Evaluation Kit with an iCE40HX1K-TQ100.
 //   The JTAG emulator for progrmming is the first instance of the two FTDI ports.
 //   The serial COM port is the latter selection of the two FTDI ports.
+//   Use at the end of module declaration where needed: /* synthesis syn_hier="fixed" */
 
 `default_nettype none
 
@@ -18,8 +19,8 @@ module fpga_top (
   input  wire       dtrn,    // PIO_3[4], pin 3  (RS232_DTRn)
   input  wire       rx,      // PIO_3[8], pin 9  (RS232_RX)
   input  wire       rtsn,    // PIO_3[6], pin 7  (RS232_RTSn)
-  input  wire [7:0] ui_in,   // PIO_0[9:2]       (J1, pullup)
-  output wire [7:0] uo_out,  // PIO_1[9:2]       (PMOD)
+  input  wire [7:0] ui_in,   // PMOD
+  output wire [7:0] uo_out,  // PMOD
   output wire       tx,      // PIO_3[7], pin 8  (RS232_TX)
   output wire [4:0] led      // PIO_1[10:14]
 ) /* synthesis syn_hier="fixed" */;
@@ -27,33 +28,41 @@ module fpga_top (
   localparam OSCRATE = 12_000_000;  // external oscillator
   localparam BAUDRATE = 9600;       // serial baud rate
 
-  wire pwm;
-  wire [3:0] dac;
+  wire apu_ref;
   wire blink;
   wire link;
+  wire pwm;
   wire rst_n = dtrn;
+  wire apu_clk = ui_in[1];      // APU clock
 
-  assign led[0] = blink;     // D1, 1 Hz blink
-  assign led[1] = link;      // D3, RX activity status
-  assign led[2] = dtrn;      // D2, DTRn from COM
-  assign led[3] = rtsn;      // D4, RTSn from COM
-  assign led[4] = (ui_in == 8'hFF);  // D5, power (center green LED)
-  assign uo_out[2:0] = 0;    // output pins from project
-  assign uo_out[3] = pwm;    // PWM audio output
-  assign uo_out[7:4] = dac;  // raw audio
-  assign tx = rx;            // serial loop-back to host
+  assign led[0] = blink;        // D1, 1 Hz blink
+  assign led[1] = link;         // D3, RX activity status
+  assign led[2] = dtrn;         // D2, DTRn from COM
+  assign led[3] = rtsn;         // D4, RTSn from COM
+  assign led[4] = ( ui_in[7:2] == 0 ) 
+               && ( ui_in[0] == 0 );  // D5, power (center green LED)
+  assign uo_out[0] = 0;
+  assign uo_out[1] = 0;
+  assign uo_out[2] = apu_ref;   // 1.79 MHz clock output, connect to ui_in[1]
+  assign uo_out[3] = pwm;       // PWM audio output
+  assign uo_out[4] = 0;
+  assign uo_out[5] = 0;
+  assign uo_out[6] = 0;
+  assign uo_out[7] = 0;
+  assign tx = rx;               // serial loop-back to host
 
   chiptune #(
     .OSCRATE(OSCRATE),
     .BAUDRATE(BAUDRATE)
   ) chiptune_inst (
-    .osc  (clk),
-    .rst_n(rst_n),
-    .rx   (rx),     // serial data input
-    .pwm  (pwm),    // audio PWM
-    .dac  (dac),    // audio DAC
-    .blink(blink),  // status LED
-    .link (link)    // link LED
+    .clk    (clk),
+    .rst_n  (rst_n),
+    .apu_clk(apu_clk),
+    .rx     (rx),
+    .apu_ref(apu_ref),
+    .blink  (blink),
+    .link   (link),
+    .pwm    (pwm)
   );
   
 endmodule

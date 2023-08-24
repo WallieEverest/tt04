@@ -16,7 +16,7 @@ module frame #(
   input  wire clk,               // system clock
   output reg enable_240hz = 0,   // 240 Hz
   output reg enable_120hz = 0    // 120 Hz
-) /* synthesis syn_hier="fixed" */;
+);
 
 localparam PRESCALE = CLKRATE/240;  // frame rate
 reg [12:0] prescaler = 0 /* synthesis syn_preserve=1 */;  // size allows max system clock of 1.9 MHz

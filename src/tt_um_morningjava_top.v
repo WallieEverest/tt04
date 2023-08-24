@@ -27,17 +27,21 @@ module tt_um_morningjava_top (
   localparam OSCRATE = 12_000_000;  // external oscillator
   localparam BAUDRATE = 9600;       // serial baud rate
 
-  wire pwm;
-  wire [3:0] dac;
+  wire apu_ref;
   wire blink;
   wire link;
-  wire rx = ui_in[2];
+  wire pwm;
+  wire rx = ui_in[2];          // UART RX
+  wire apu_clk = ui_in[7];     // APU clock
 
-  assign uo_out[0] = blink;  // 1 Hz blink
-  assign uo_out[1] = link;   // RX activity status
-  assign uo_out[2] = rx;     // serial loop-back to host
-  assign uo_out[3] = pwm;    // PWM audio output
-  assign uo_out[7:4] = dac;  // raw audio
+  assign uo_out[0] = blink;    // 1 Hz blink
+  assign uo_out[1] = 0;
+  assign uo_out[2] = rx;       // UART TX, serial loop-back to host
+  assign uo_out[3] = pwm;      // PWM audio output
+  assign uo_out[4] = link;     // RX activity status 
+  assign uo_out[5] = 0;
+  assign uo_out[6] = 0;
+  assign uo_out[7] = apu_ref;  // 1.79 MHz
   assign uio_out = 0;
   assign uio_oe = 0;
 
@@ -45,13 +49,14 @@ module tt_um_morningjava_top (
     .OSCRATE(OSCRATE),
     .BAUDRATE(BAUDRATE)
   ) chiptune_inst (
-    .osc  (clk),
-    .rst_n(rst_n),
-    .rx   (rx),     // serial data input
-    .pwm  (pwm),    // audio PWM
-    .dac  (dac),    // audio DAC
-    .blink(blink),  // status LED
-    .link (link)    // link LED
-  );
+    .clk    (clk),
+    .rst_n  (rst_n),
+    .apu_clk(apu_clk),
+    .rx     (rx),
+    .apu_ref(apu_ref),
+    .blink  (blink),
+    .link   (link),
+    .pwm    (pwm)
+  );  
 
 endmodule

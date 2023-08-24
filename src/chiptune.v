@@ -14,19 +14,19 @@ module chiptune #(
   parameter OSCRATE = 12_000_000,  // external oscillator
   parameter BAUDRATE = 9600        // serial baud rate
 )(
-  input  wire osc,        // external oscillator
-  input  wire rst_n,      // asynchronous reset
-  input  wire rx,         // serial data
-  output wire pwm,        // audio PWM
-  output wire [3:0] dac,  // audio DAC
-  output wire blink,      // status LED
-  output wire link        // link LED
-) /* synthesis syn_hier="fixed" */;
+  input  wire apu_clk,   // APU clock
+  input  wire clk,       // external oscillator
+  input  wire rst_n,     // asynchronous reset
+  input  wire rx,        // serial data
+  output wire apu_ref,   // 1.79 MHz
+  output wire blink,     // status LED
+  output wire link,      // link LED
+  output wire pwm       // audio PWM
+);
 
   localparam CLKRATE = 1_790_000;  // APU system clock
 
-  wire clk;
-  wire clk_uart;
+  wire uart_clk;      // 48 kHz
   wire enable_240hz;  // 240 Hz
   wire enable_120hz;  // 120 Hz
   wire [16*8-1:0] reg_data;
@@ -39,13 +39,35 @@ module chiptune #(
   wire [5:0] pwm_data;
   reg reset /* synthesis syn_preserve=1 */;
   reg reset_meta;
-  assign dac = pwm_data[5:2];
 
   genvar i;
   for (i=0; i<=15; i=i+1) assign reg_array[i] = reg_data[8*i+7:8*i];
 
+  // *** OSC Clock Domain ***
+  prescaler #(
+    .OSCRATE(OSCRATE),    // oscillator frequency
+    .BAUDRATE(BAUDRATE),  // baud rate
+    .APURATE(1_790_000)   // system clock frequency
+  ) prescaler_inst (
+    .clk     (clk),       // system oscillator
+    .rx      (rx),        // serial input for activity indicator
+    .apu_clk (apu_ref),   // APU system clock, ~1.79 MHz
+    .blink   (blink),     // 1 Hz blink indicator
+    .link    (link),      // activity indicator
+    .uart_clk(uart_clk)   // 5x UART clock, 48 kHz
+  );
+
+  // *** UART Clock Domain ***
+  uart uart_inst (
+    .clk      (uart_clk),
+    .rx       (rx),
+    .reg_data (reg_data),
+    .reg_event(reg_event)
+  );
+
+  // *** APU Clock Domain ***
   // Synchronize external reset to clock
-  always @(posedge clk) begin
+  always @(posedge apu_clk) begin
     if (rst_n == 0) begin
       reset <= 1;
       reset_meta <= 1;
@@ -55,36 +77,16 @@ module chiptune #(
     end
   end
 
-  prescaler #(
-    .OSCRATE(OSCRATE),    // oscillator frequency
-    .BAUDRATE(BAUDRATE),  // baud rate
-    .CLKRATE(1_790_000)   // system clock frequency
-  ) prescaler_inst (
-    .osc     (osc),       // system oscillator
-    .rx      (rx),        // serial input for activity indicator
-    .clk     (clk),       // APU system clock, ~1.79 MHz
-    .clk_uart(clk_uart),  // 5x UART clock, 48 kHz
-    .blink   (blink),     // 1 Hz blink indicator
-    .link    (link)       // activity indicator
-  );
-
-  uart uart_inst (
-    .clk      (clk_uart),
-    .rx       (rx),
-    .reg_data (reg_data),
-    .reg_event(reg_event)
-  );
-
   frame #(
     .CLKRATE(CLKRATE)
   ) frame_inst (
-    .clk         (clk),
+    .clk         (apu_clk),
     .enable_240hz(enable_240hz),
     .enable_120hz(enable_120hz)
   );
   
   square square1_inst (
-    .clk         (clk),
+    .clk         (apu_clk),
     .enable_240hz(enable_240hz),
     .enable_120hz(enable_120hz),
     .reg_4000    (reg_array[4'h0]),
@@ -96,7 +98,7 @@ module chiptune #(
   );
 
   square square2_inst (
-    .clk         (clk),
+    .clk         (apu_clk),
     .enable_240hz(enable_240hz),
     .enable_120hz(enable_120hz),
     .reg_4000    (reg_array[4'h4]),
@@ -108,7 +110,7 @@ module chiptune #(
   );
 
   triangle triangle_inst (
-    .clk         (clk),
+    .clk         (apu_clk),
     .enable_240hz(enable_240hz),
     .reg_4008    (reg_array[4'h8]),
     .reg_400A    (reg_array[4'hA]),
@@ -118,7 +120,7 @@ module chiptune #(
   );
 
   noise noise_inst (
-    .clk         (clk),
+    .clk         (apu_clk),
     .enable_240hz(enable_240hz),
     .reg_400C    (reg_array[4'hC]),
     .reg_400E    (reg_array[4'hE]),
@@ -136,7 +138,7 @@ module chiptune #(
   audio_pwm #(
     .WIDTH(6)
   ) audio_pwm_inst (
-    .clk  (clk),
+    .clk  (apu_clk),
     .reset(reset),
     .data (pwm_data),
     .pwm  (pwm)

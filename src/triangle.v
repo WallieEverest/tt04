@@ -34,7 +34,7 @@ module triangle (
   input wire [7:0] reg_400B,
   input wire       reg_change,
   output reg [3:0] tri_out = 0
-) /* synthesis syn_hier="fixed" */;
+);
 
   // Input registers
   wire [ 6:0]  linear_preset  = reg_4008[6:0];

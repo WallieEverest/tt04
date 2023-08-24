@@ -42,7 +42,7 @@ module uart (
   input  wire rx,   // asynchronous serial input
   output reg [16*8-1:0] reg_data = 0,  // flattened array of 16 bytes (128 bits)
   output reg  [3:0] reg_event = 0
-) /* synthesis syn_hier="fixed" */;
+);
 
   localparam [2:0] BAUD_DIV = 5;
   localparam WIDTH = 10;  // number of bits in message
@@ -62,7 +62,7 @@ module uart (
   reg  [1:0] bank_select = 0;
   wire [4:0] reg_select = {bank_select, addr};
   wire zero_count = (bit_count == 0);
-  wire msg_sync = (shift[WIDTH-1] == STOP) && (shift[0] == START) && zero_count;  // valid message
+  wire msg_sync = ( shift[WIDTH-1] == STOP ) && ( shift[0] == START ) && zero_count;  // valid message
 
   always @( posedge clk ) begin : uart_serial_clock
     rx_meta <= rx;       // capture asynchronous input

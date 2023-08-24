@@ -16,7 +16,7 @@ module audio_pwm #(
   input  wire reset,
   input  wire [WIDTH-1:0] data,  // unsigned input
   output wire pwm
-) /* synthesis syn_hier="fixed" */;
+);
 
   wire [WIDTH:0] data_ext = {1'b0, data};  // extend vector
   reg [WIDTH:0] accum = 0;    // unsigned

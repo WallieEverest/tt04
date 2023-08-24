@@ -30,7 +30,7 @@ module noise (
   input wire [7:0] reg_400F,
   input wire       reg_change,
   output reg [3:0] noise_out = 0
-) /* synthesis syn_hier="fixed" */;
+);
 
   // Input registers
   wire [ 3:0] envelope         = reg_400C[3:0];

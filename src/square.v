@@ -35,7 +35,7 @@ module square (
   input wire [7:0] reg_4003,
   input wire       reg_change,
   output reg [3:0] pulse_out = 0
-) /* synthesis syn_hier="fixed" */;
+);
 
   // Input registers
   wire [ 3:0] decay_rate      = reg_4000[3:0];  // volume / decay rate
