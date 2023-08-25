@@ -65,10 +65,6 @@ module a_tb_fpga_top ();
 
   initial begin
     repeat (2) @(negedge sck);
-    
-    // Set Bank 0
-    message = {STOP,8'h80,START};
-    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
 
     // SMBDIS.ASM
     // PlayBigJump:
@@ -83,22 +79,22 @@ module a_tb_fpga_top ();
       
     message = {STOP,8'h27,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h3A,START};
+    message = {STOP,8'h83,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
 
     message = {STOP,8'h02,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h18,START};
+    message = {STOP,8'h81,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
 
-    message = {STOP,8'h4C,START};
+    message = {STOP,8'h7C,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h57,START};
+    message = {STOP,8'h84,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
 
-    message = {STOP,8'h69,START};
+    message = {STOP,8'h09,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h70,START};
+    message = {STOP,8'h86,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
 
     #200ms
@@ -113,24 +109,24 @@ module a_tb_fpga_top ();
     //  SND_REGISTER+3 = 0x0A; FreqRegLookupTbl[A=12] | 0x08
     //  descending tone
 
-    message = {STOP,8'h23,START};
+    message = {STOP,8'h13,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h39,START};
-    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-
-    message = {STOP,8'h0E,START};
-    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h19,START};
+    message = {STOP,8'h83,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
 
-    message = {STOP,8'h4A,START};
+    message = {STOP,8'h1E,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h53,START};
+    message = {STOP,8'h81,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
 
-    message = {STOP,8'h6A,START};
+    message = {STOP,8'h3A,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h70,START};
+    message = {STOP,8'h84,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    message = {STOP,8'h0A,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h86,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
 
     #400ms
@@ -144,24 +140,24 @@ module a_tb_fpga_top ();
     //  SND_REGISTER+3 = 0x08; FreqRegLookupTbl[A=40] | 0x08
     //  ascending and fading tone
 
-    message = {STOP,8'h2B,START};
+    message = {STOP,8'h4B,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h3C,START};
-    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-
-    message = {STOP,8'h0F,START};
-    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h19,START};
+    message = {STOP,8'h83,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
 
-    message = {STOP,8'h4F,START};
+    message = {STOP,8'h1F,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h5E,START};
+    message = {STOP,8'h81,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
 
-    message = {STOP,8'h68,START};
+    message = {STOP,8'h6F,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
-    message = {STOP,8'h70,START};
+    message = {STOP,8'h85,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    message = {STOP,8'h08,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h86,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};        
   end
 
@@ -230,5 +226,31 @@ module a_tb_fpga_top ();
   // SND_SQUARE2_REG+1 = 0x5D; Y
   // SND_REGISTER2+2 = 0x71; FreqRegLookupTbl+1[A=66]
   // SND_REGISTER2+3 = 0x08; FreqRegLookupTbl[A=0x42] | 0x08
+
+
+// # Square 1
+// 08 82 30 80 00 84 00 86 #Clear
+// 27 83 02 81 7E 85 08 86 #PlaySmallJump
+// 27 83 02 81 7C 84 09 86 #PlayBigJump
+// 13 83 1E 81 3A 84 0A 86 #PlayBump
+// 19 83 1E 81 0A 84 08 86 #PlayFireballThrow
+// 4B 83 1F 81 6F 85 08 86 #PlaySmackEnemy
+// 1C 83 1E 81 7E 85 08 86 #PlaySwimStomp
+// 08 82 3F 81 17 84 01 86 #400Hz
+// # Square 2
+// 30 88 08 8A 00 8C 00 8E #Clear
+// 18 89 7F 8A 71 8C 08 8E #PlayTimerTick
+// 0D 89 7F 8A 71 8C 08 8E #PlayCoinGrab
+// 1F 89 14 8B 79 8D 0A 8E #PlayBlast
+// 7F 88 5D 8A 71 8C 08 8E #PlayPowerUpGrab
+// 3F 89 08 8A 17 8C 01 8E #400Hz
+// # Triangle
+// 00 91 00 92 00 94 00 96 #Clear
+// 00 92 0B 95 00 96 40 91 #400Hz
+// # Noise
+// 30 98 00 9A 00 9C 00 9E #Clear
+// 00 9A 00 9E 05 9D 3F 98 #300Hz
+//  #StrongBeat
+//  #LongBeat
 
 endmodule

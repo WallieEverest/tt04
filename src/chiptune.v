@@ -37,8 +37,8 @@ module chiptune #(
   wire [3:0] tri_out;
   wire [3:0] noise_out;
   wire [5:0] pwm_data;
-  wire [4:0] uart_addr;
-  wire [3:0] uart_data;
+  wire [3:0] uart_addr;
+  wire [7:0] uart_data;
   wire uart_ready;
   reg reset /* synthesis syn_preserve=1 */;
   reg reset_meta;
