@@ -37,7 +37,7 @@ module square (
   output reg [3:0] pulse_out = 0
 );
 
-  // Input registers
+  // Input assignments
   wire [ 3:0] decay_rate      = reg_4000[3:0];  // volume / decay rate
   wire        decay_halt      = reg_4000[4];
   wire        length_halt     = reg_4000[5];  // length disable / decay looping enable
@@ -46,17 +46,10 @@ module square (
   wire        sweep_decrement = reg_4001[3];
   wire [ 2:0] sweep_rate      = reg_4001[6:4];
   wire        sweep_enable    = reg_4001[7];
-  wire [10:0] timer_preset      = {reg_4003[2:0], reg_4002};
+  wire [10:0] timer_preset    = {reg_4003[2:0], reg_4002};
   wire [ 4:0] length_select   = reg_4003[7:3];
-  wire [ 3:0] volume;
-  wire length_count_zero;
-  wire [11:0] preset_decrement;
-  wire [11:0] preset_increment;
-  wire preset_valid;
 
   reg timer_event = 0;
-  //reg reload = 0;
-  //reg [ 1:0] reg_delay = 0;
   reg [ 7:0] length_counter = 0;
   reg [ 2:0] sweep_counter = 0;
   reg [10:0] timer_load = 0;
@@ -66,30 +59,32 @@ module square (
   reg [ 2:0] index = 0;
   reg [ 7:0] length_preset;
   reg [ 7:0] duty_cycle_pattern;
+  reg length_count_zero;
+  reg [11:0] preset_decrement;
+  reg [11:0] preset_increment;
+  reg preset_valid;
+  reg [ 3:0] volume;
 
-  // Detect configuration change
-  // always @( posedge clk ) begin : square_reload
-  //   reg_delay[0] <= reg_change;  // asynchronous input from clock crossing
-  //   reg_delay[1] <= reg_delay[0];
-  //   reload <= ( reg_delay[1] != reg_delay[0] );  // detect edge of toggle input
-  // end
+  always @* begin : square_comb
+    length_count_zero <= ( length_counter == 0 );
+    preset_decrement  <= {1'b0, timer_load} - (timer_preset >> sweep_shift);  // should be 1's compliment for CH1
+    preset_increment  <= {1'b0, timer_load} + (timer_preset >> sweep_shift);
+    preset_valid      <= ( !preset_increment[11] && !preset_decrement[11] && (timer_load[10:3] != 0) );
+    if ( decay_halt )
+      volume <= decay_rate;
+    else
+      volume <= envelope_counter;
+  end
 
   // Length counter
-  assign length_count_zero = ( length_counter == 0 );
-
-  always @( posedge clk ) begin : square_length_couner
-    if ( length_halt ) begin
-      length_counter <= 0;
-    end else begin
-      if ( reg_event )
-        length_counter <= length_preset;
-      else if ( enable_120hz && !length_count_zero )
-        length_counter <= length_counter - 1;
-    end
+  always @( posedge clk ) begin : square_length_counter
+    if ( reg_event )
+      length_counter <= length_preset;
+    else if ( !length_halt && enable_120hz && !length_count_zero )
+      length_counter <= length_counter - 1;
   end
   
-  always @*  // shifted left to count at 60 Hz
-  begin
+  always @* begin : square_length_lookup
     case ( length_select )
        0: length_preset = 8'h0A;
        1: length_preset = 8'hFE;
@@ -127,8 +122,6 @@ module square (
   end
   
   // Envelope unit
-  assign volume = decay_halt ? decay_rate : envelope_counter;
-
   always @( posedge clk ) begin : square_envelope_counter
     if ( reg_event ) begin
       decay_counter <= decay_rate;
@@ -149,9 +142,6 @@ module square (
   end
 
   // Sweep unit
-  assign preset_decrement = {1'b0, timer_load} - (timer_preset >> sweep_shift);  // should be 1's compliment for CH1
-  assign preset_increment = {1'b0, timer_load} + (timer_preset >> sweep_shift);
-  assign preset_valid = (!preset_increment[11] && !preset_decrement[11] && (timer_load[10:3] != 0) );
   // DEBUG: Clock enable has priority over reload
   always @( posedge clk ) begin : square_sweep_counter
     if ( reg_event ) begin
@@ -190,21 +180,18 @@ module square (
 
   // Duty cycle
   always @( posedge clk ) begin : square_duty_cycle
-    if ( reg_event ) begin
+    if ( reg_event ) 
       index <= ~0;
-    end else begin
-      if ( timer_event && !length_count_zero ) begin
-        index <= index - 1;
-        if ( duty_cycle_pattern[index] && preset_valid)
-          pulse_out <= volume;
-        else
-          pulse_out <= 0;  // was -volume
-      end
-    end
+    else if ( timer_event && !length_count_zero )
+      index <= index - 1;
+
+    if ( duty_cycle_pattern[index] && preset_valid && !length_count_zero)
+      pulse_out <= volume;
+    else
+      pulse_out <= 0;
   end
 
-  always @*
-  begin
+  always @* begin : square_duty_cycle_lookup
     case ( duty_cycle_type )
       0: duty_cycle_pattern = 8'b00000010;
       1: duty_cycle_pattern = 8'b00000110;

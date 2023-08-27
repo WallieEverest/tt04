@@ -36,7 +36,7 @@ module triangle (
   output reg [3:0] tri_out = 0
 );
 
-  // Input registers
+  // Input assignments
   wire [ 6:0]  linear_preset  = reg_4008[6:0];
   wire         linear_control = reg_4008[7];
   wire [ 10:0] timer_preset   = {reg_400B[2:0], reg_400A};
@@ -47,23 +47,20 @@ module triangle (
   reg [ 7:0] length_preset;
   reg [10:0] timer = 0;
   reg [ 4:0] sequencer = 0;
-  reg        linear_reload = 0;
-  reg        timer_event = 0;
-  reg        length_halt = 0;
-  // reg [1:0]  reg_delay = 0;
-  // reg        reload = 0;
-  
-  wire linear_count_zero    = ( linear_counter == 0 );
-  wire length_count_zero    = ( length_counter == 0 );
-  wire timer_count_zero     = ( timer == 0 );
-  wire sequencer_count_zero = ( sequencer == 0 );
+  reg linear_reload = 0;
+  reg timer_event = 0;
+  reg length_halt = 0;
+  reg linear_count_zero;
+  reg length_count_zero;
+  reg timer_count_zero;
+  reg sequencer_count_zero;
 
-  // Detect configuration change on $400B
-  // always @( posedge clk ) begin : triangle_reload
-  //   reg_delay[0] <= reg_change;  // asynchronous input from clock crossing
-  //   reg_delay[1] <= reg_delay[0];
-  //   reload <= ( reg_delay[1] != reg_delay[0] );  // detect edge of toggle input
-  // end
+  always @* begin : triangle_comb
+    linear_count_zero    <= ( linear_counter == 0 );
+    length_count_zero    <= ( length_counter == 0 );
+    timer_count_zero     <= ( timer == 0 );
+    sequencer_count_zero <= ( sequencer == 0 );
+  end
 
   // Select active counter
   always @( posedge clk ) begin : triangle_counter_select
@@ -97,7 +94,7 @@ module triangle (
     end
   end
   
-  always @* begin
+  always @* begin : triangle_length_lookup
     case ( length_select )
        0: length_preset = 8'h0A;
        1: length_preset = 8'hFE;

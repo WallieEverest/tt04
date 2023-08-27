@@ -14,13 +14,13 @@ module chiptune #(
   parameter OSCRATE = 12_000_000,  // external oscillator
   parameter BAUDRATE = 9600        // serial baud rate
 )(
-  input  wire apu_clk,   // APU clock
-  input  wire clk,       // external oscillator
-  input  wire rst_n,     // asynchronous reset
-  input  wire rx,        // serial data
-  output wire apu_ref,   // 1.79 MHz
-  output wire blink,     // status LED
-  output wire link,      // link LED
+  input  wire apu_clk,  // APU clock
+  input  wire clk,      // external oscillator
+  input  wire rst_n,    // asynchronous reset
+  input  wire rx,       // serial data
+  output wire apu_ref,  // 1.79 MHz
+  output wire blink,    // status LED
+  output wire link,     // link LED
   output wire pwm       // audio PWM
 );
 

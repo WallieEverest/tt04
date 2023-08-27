@@ -32,7 +32,7 @@ module noise (
   output reg [3:0] noise_out = 0
 );
 
-  // Input registers
+  // Input assignments
   wire [ 3:0] envelope         = reg_400C[3:0];
   wire        constant_volume  = reg_400C[4];  // DEBUG
   wire        length_halt      = reg_400C[5];
@@ -45,20 +45,19 @@ module noise (
   reg [11:0] timer_preset;
   reg [11:0] timer = 0;
   reg        timer_event = 0;
-  // reg [1:0]  reg_delay = 0;
-  // reg        reload = 0;
   reg [ 7:0] length_preset;
+  reg length_count_zero;
+  reg timer_count_zero;
+  reg feedback;
 
-  wire length_count_zero    = ( length_counter == 0 );
-  wire timer_count_zero     = ( timer == 0 );
-  wire feedback = mode_flag ? (shift_register[6] ^ shift_register[0]) : (shift_register[1] ^ shift_register[0]);
-
-  // Detect configuration change on $400F
-  // always @( posedge clk ) begin : noise_reload
-  //   reg_delay[0] <= reg_change;  // asynchronous input from clock crossing
-  //   reg_delay[1] <= reg_delay[0];
-  //   reload <= ( reg_delay[1] != reg_delay[0] );  // detect edge of toggle input
-  // end
+  always @* begin : noise_comb
+    length_count_zero <= ( length_counter == 0 );
+    timer_count_zero  <= ( timer == 0 );
+    if ( mode_flag )
+      feedback <= shift_register[6] ^ shift_register[0];
+    else
+      feedback <= shift_register[1] ^ shift_register[0];
+  end
 
   // Linear Feedback Shift Register
   always @( posedge clk ) begin : noise_lfsr
@@ -76,7 +75,7 @@ module noise (
       length_counter <= length_counter - 1;
   end
 
-  always @* begin
+  always @* begin : noise_length_lookup
     case ( length_select )
        0: length_preset = 8'h0A;
        1: length_preset = 8'hFE;
@@ -122,7 +121,7 @@ module noise (
       timer <= timer - 1;
   end
 
-  always @* begin
+  always @* begin : noise_timer_lookup
     case ( timer_select )
       0:  timer_preset = 12'h004;
       1:  timer_preset = 12'h008;
