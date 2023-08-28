@@ -11,7 +11,7 @@ project:
     - square.v
     - triangle.v
     - uart.v
-    - chiptune.v
+    - apu.v
     - tt_um_morningjava_top.v
   top_module: "tt_um_morningjava_top"
 

@@ -35,7 +35,7 @@ module tb_triangle ();
     .fc_enable_240hz ( enable_240hz ),
     .fc_enable_120hz ( enable_120hz )
   );
-  
+
   rectangle rectangle_inst (
     .clk          (clk),
     .enable_240hz (enable_240hz),

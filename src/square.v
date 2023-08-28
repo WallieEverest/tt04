@@ -9,19 +9,17 @@
 // --------------
 // Square Channel
 // --------------
-//                    +---------+    +---------+
-//                    |  Sweep  |--->|Timer / 2|
-//                    +---------+    +---------+
-//                         |              |
-//                         |              v 
-//                         |         +---------+    +---------+
-//                         |         |Sequencer|    | Length  |
-//                         |         +---------+    +---------+
-//                         |              |              |
-//                         v              v              v
-//     +---------+        |\             |\             |\          +---------+
-//     |Envelope |------->| >----------->| >----------->| >-------->|   DAC   |
-//     +---------+        |/             |/             |/          +---------+
+//                  Sweep -----> Timer
+//                    |            |
+//                    |            v
+//                    |        Sequencer   Length Counter
+//                    |            |             |
+//                    v            v             v
+// Envelope -------> Gate -----> Gate -------> Gate --->(to mixer)
+//
+// To do:
+//   1.) When looping, after reaching 0 the envelope will restart at volume 15 at its next period.
+//   2.) preset_decrement should be 1's compliment for CH1
 
 `default_nettype none
 
@@ -49,27 +47,28 @@ module square (
   wire [10:0] timer_preset    = {reg_4003[2:0], reg_4002};
   wire [ 4:0] length_select   = reg_4003[7:3];
 
-  reg timer_event = 0;
-  reg [ 7:0] length_counter = 0;
+  reg [ 2:0] index = 0;
   reg [ 2:0] sweep_counter = 0;
-  reg [10:0] timer_load = 0;
   reg [ 3:0] decay_counter = 0;
   reg [ 3:0] envelope_counter = 0;
+  reg [ 7:0] length_counter = 0;
   reg [10:0] timer = 0;
-  reg [ 2:0] index = 0;
+  reg [10:0] timer_load = 0;
+  reg timer_event = 0;
+
+  reg [ 3:0] volume;
+  reg [ 0:7] duty_cycle_pattern;
   reg [ 7:0] length_preset;
-  reg [ 7:0] duty_cycle_pattern;
-  reg length_count_zero;
   reg [11:0] preset_decrement;
   reg [11:0] preset_increment;
-  reg preset_valid;
-  reg [ 3:0] volume;
+  reg length_count_zero;
+  reg mute;
 
   always @* begin : square_comb
     length_count_zero <= ( length_counter == 0 );
-    preset_decrement  <= {1'b0, timer_load} - (timer_preset >> sweep_shift);  // should be 1's compliment for CH1
+    preset_decrement  <= {1'b0, timer_load} - (timer_preset >> sweep_shift);
     preset_increment  <= {1'b0, timer_load} + (timer_preset >> sweep_shift);
-    preset_valid      <= ( !preset_increment[11] && !preset_decrement[11] && (timer_load[10:3] != 0) );
+    mute              <= ( preset_increment[11] || preset_decrement[11] || (timer_load[10:3] == 0) );
     if ( decay_halt )
       volume <= decay_rate;
     else
@@ -80,10 +79,10 @@ module square (
   always @( posedge clk ) begin : square_length_counter
     if ( reg_event )
       length_counter <= length_preset;
-    else if ( !length_halt && enable_120hz && !length_count_zero )
+    else if ( enable_120hz && !length_count_zero && !length_halt )
       length_counter <= length_counter - 1;
   end
-  
+
   always @* begin : square_length_lookup
     case ( length_select )
        0: length_preset = 8'h0A;
@@ -120,7 +119,7 @@ module square (
       31: length_preset = 8'h1E;
     endcase
   end
-  
+
   // Envelope unit
   always @( posedge clk ) begin : square_envelope_counter
     if ( reg_event ) begin
@@ -142,9 +141,8 @@ module square (
   end
 
   // Sweep unit
-  // DEBUG: Clock enable has priority over reload
   always @( posedge clk ) begin : square_sweep_counter
-    if ( reg_event ) begin
+    if ( reg_event ) begin  // DEBUG: The reg_event condition is not confirmed
       sweep_counter <= sweep_rate;
       timer_load <= timer_preset;
     end else begin
@@ -180,12 +178,12 @@ module square (
 
   // Duty cycle
   always @( posedge clk ) begin : square_duty_cycle
-    if ( reg_event ) 
-      index <= ~0;
+    if ( reg_event )
+      index <= 0;
     else if ( timer_event && !length_count_zero )
       index <= index - 1;
 
-    if ( duty_cycle_pattern[index] && preset_valid && !length_count_zero)
+    if ( duty_cycle_pattern[index] && !mute && !length_count_zero)
       pulse_out <= volume;
     else
       pulse_out <= 0;
@@ -193,10 +191,10 @@ module square (
 
   always @* begin : square_duty_cycle_lookup
     case ( duty_cycle_type )
-      0: duty_cycle_pattern = 8'b00000010;
-      1: duty_cycle_pattern = 8'b00000110;
-      2: duty_cycle_pattern = 8'b00011110;
-      3: duty_cycle_pattern = 8'b11111001;
+      0: duty_cycle_pattern = 8'b00000001;
+      1: duty_cycle_pattern = 8'b00000011;
+      2: duty_cycle_pattern = 8'b00001111;
+      3: duty_cycle_pattern = 8'b11111100;
     endcase
   end
 

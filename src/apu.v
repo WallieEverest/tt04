@@ -1,5 +1,5 @@
 // Title:   Sound generator
-// File:    chiptune.v
+// File:    apu.v
 // Author:  Wallace Everest
 // Date:    12-APR-2023
 // URL:     https://github.com/wallieeverest/tt04
@@ -10,7 +10,7 @@
 
 `default_nettype none
 
-module chiptune #(
+module apu #(
   parameter OSCRATE = 12_000_000,  // external oscillator
   parameter BAUDRATE = 9600        // serial baud rate
 )(
@@ -75,7 +75,7 @@ module chiptune #(
     if (rst_n == 0) begin
       reset <= 1;
       reset_meta <= 1;
-    end else begin      
+    end else begin
       reset <= reset_meta;
       reset_meta <= 0;
     end
@@ -97,7 +97,7 @@ module chiptune #(
     .enable_240hz(enable_240hz),
     .enable_120hz(enable_120hz)
   );
-  
+
   square square1_inst (
     .clk         (apu_clk),
     .enable_240hz(enable_240hz),

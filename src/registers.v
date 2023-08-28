@@ -42,7 +42,7 @@ module registers (
   always @( posedge clk ) begin : registers_decode
     uart_meta <= uart_ready;
     edge_detect <= {edge_detect[0], uart_meta};
-    
+
     if ( uart_event ) begin   // capture inbound data
       reg_data[8*uart_addr+0] <= uart_data[0];
       reg_data[8*uart_addr+1] <= uart_data[1];

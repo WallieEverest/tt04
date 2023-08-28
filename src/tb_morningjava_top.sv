@@ -52,7 +52,7 @@ module a_tb_morning_java_top ();
 
   initial begin
     repeat (2) @(negedge sck);
-    
+
     // SMBDIS.ASM
     // PlayBigJump:
     //  SND_SQUARE1_REG+1 = 0xA7; Y
@@ -61,7 +61,7 @@ module a_tb_morning_java_top ();
     //  SND_REGISTER+3 = 0x09; FreqRegLookupTbl+1[A=24] | 0x08
     //  lda #$28                  ;store length of sfx for both jumping sounds
     //  sta Squ1_SfxLenCounter    ;then continue on here
-      
+
     message = {STOP,8'h27,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
     message = {STOP,8'h3A,START};
@@ -139,7 +139,7 @@ module a_tb_morning_java_top ();
     message = {STOP,8'h68,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
     message = {STOP,8'h70,START};
-    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};        
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
   end
 
 endmodule

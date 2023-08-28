@@ -38,17 +38,17 @@ module tt_um_morningjava_top (
   assign uo_out[1] = 0;
   assign uo_out[2] = rx;       // UART TX, serial loop-back to host
   assign uo_out[3] = pwm;      // PWM audio output
-  assign uo_out[4] = link;     // RX activity status 
+  assign uo_out[4] = link;     // RX activity status
   assign uo_out[5] = 0;
   assign uo_out[6] = 0;
   assign uo_out[7] = apu_ref;  // 1.79 MHz
   assign uio_out = 0;
   assign uio_oe = 0;
 
-  chiptune #(
+  apu #(
     .OSCRATE(OSCRATE),
     .BAUDRATE(BAUDRATE)
-  ) chiptune_inst (
+  ) apu_inst (
     .clk    (clk),
     .rst_n  (rst_n),
     .apu_clk(apu_clk),
@@ -57,6 +57,6 @@ module tt_um_morningjava_top (
     .blink  (blink),
     .link   (link),
     .pwm    (pwm)
-  );  
+  );
 
 endmodule

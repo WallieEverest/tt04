@@ -39,7 +39,7 @@ module fpga_top (
   assign led[1] = link;         // D3, RX activity status
   assign led[2] = dtrn;         // D2, DTRn from COM
   assign led[3] = rtsn;         // D4, RTSn from COM
-  assign led[4] = ( ui_in[7:2] == 0 ) 
+  assign led[4] = ( ui_in[7:2] == 0 )
                && ( ui_in[0] == 0 );  // D5, power (center green LED)
   assign uo_out[0] = 0;
   assign uo_out[1] = 0;
@@ -51,10 +51,10 @@ module fpga_top (
   assign uo_out[7] = 0;
   assign tx = rx;               // serial loop-back to host
 
-  chiptune #(
+  apu #(
     .OSCRATE(OSCRATE),
     .BAUDRATE(BAUDRATE)
-  ) chiptune_inst (
+  ) apu_inst (
     .clk    (clk),
     .rst_n  (rst_n),
     .apu_clk(apu_clk),
@@ -64,5 +64,5 @@ module fpga_top (
     .link   (link),
     .pwm    (pwm)
   );
-  
+
 endmodule

@@ -31,7 +31,7 @@ module a_tb_fpga_top ();
   localparam [WIDTH-1:0] IDLE = ~0;
   localparam START = 1'b0;
   localparam STOP  = 1'b1;
-  
+
   reg  [WIDTH-1:0] message = IDLE;  // default to IDLE pattern
   reg  clk = 0;
   reg  sck = 0;
@@ -59,7 +59,7 @@ module a_tb_fpga_top ();
     .tx(),
     .led()
   );
-    
+
   initial forever #41.7ns clk = ~clk;   // 12 MHz system clock
   initial forever #52083ns sck = ~sck;  // 9,600 baud UART
 
@@ -76,7 +76,7 @@ module a_tb_fpga_top ();
     //  lda #$28                  ;store length of sfx for both jumping sounds
     //  sta Squ1_SfxLenCounter    ;then continue on here
     //  fading tone
-      
+
     message = {STOP,8'h27,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
     message = {STOP,8'h83,START};
@@ -158,7 +158,7 @@ module a_tb_fpga_top ();
     message = {STOP,8'h08,START};
     repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
     message = {STOP,8'h86,START};
-    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};        
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
   end
 
   // PlayFireballThrow
@@ -193,7 +193,7 @@ module a_tb_fpga_top ();
 
   // PlayCoinGrab:
   // lda #$35
-  // sta Squ2_SfxLenCounter 
+  // sta Squ2_SfxLenCounter
   // lda #$42
   // SND_SQUARE2_REG = 0x8D; X
   // SND_SQUARE2_REG+1 = 0x7F; Y
@@ -202,7 +202,7 @@ module a_tb_fpga_top ();
 
   // PlayTimerTick:
   // lda #$06
-  // sta Squ2_SfxLenCounter 
+  // sta Squ2_SfxLenCounter
   // lda #$42
   // SND_SQUARE2_REG = 0x98; X
   // SND_SQUARE2_REG+1 = 0x7F; Y
@@ -211,7 +211,7 @@ module a_tb_fpga_top ();
 
   // PlayBlast:
   // lda #$20
-  // sta Squ2_SfxLenCounter 
+  // sta Squ2_SfxLenCounter
   // lda #$42
   // SND_SQUARE2_REG = 0x9F; X
   // SND_SQUARE2_REG+1 = 0x94; Y
@@ -220,7 +220,7 @@ module a_tb_fpga_top ();
 
   // PlayPowerUpGrab: debug
   // lda #$36
-  // sta Squ2_SfxLenCounter 
+  // sta Squ2_SfxLenCounter
   // lda #$42
   // SND_SQUARE2_REG = 0x7F; X
   // SND_SQUARE2_REG+1 = 0x5D; Y

@@ -6,7 +6,7 @@
 // License: Apache 2.0
 //
 // Description: (from apu_ref.txt and nesdev.org)
-// -------------   
+// -------------
 // Noise Channel
 // -------------
 // The shift register is clocked by the timer and the vacated bit 14 is filled
@@ -40,15 +40,16 @@ module noise (
   wire        mode_flag        = reg_400E[7];
   wire [ 4:0] length_select    = reg_400F[7:3];
 
-  reg [14:0] shift_register = 0;
   reg [ 7:0] length_counter = 0;
-  reg [11:0] timer_preset;
   reg [11:0] timer = 0;
-  reg        timer_event = 0;
+  reg [11:0] timer_preset;
+  reg [14:0] shift_register = 0;
+  reg timer_event = 0;
+
   reg [ 7:0] length_preset;
+  reg feedback;
   reg length_count_zero;
   reg timer_count_zero;
-  reg feedback;
 
   always @* begin : noise_comb
     length_count_zero <= ( length_counter == 0 );

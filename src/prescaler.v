@@ -62,7 +62,7 @@ module prescaler #(
 
     event_4khz <= ( count_4khz == 1 );  // 4 kHz clock
     count_4khz <= ( event_4khz ) ? 3000-1 : count_4khz-1;
-    
+
     if ( event_4khz ) begin
       event_2hz <= ( count_2hz == 1 );  // 2 Hz clock
       count_2hz <= ( event_2hz ) ? 2000-1 : count_2hz-1;
@@ -77,5 +77,5 @@ module prescaler #(
       if ( event_4khz && ( count_link != 0 ))
         count_link <= count_link-1;
   end
-  
+
 endmodule

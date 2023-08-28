@@ -42,24 +42,25 @@ module triangle (
   wire [ 10:0] timer_preset   = {reg_400B[2:0], reg_400A};
   wire [ 4:0]  length_select  = reg_400B[7:3];
 
+  reg [ 4:0] sequencer = 0;
   reg [ 6:0] linear_counter = 0;
   reg [ 7:0] length_counter = 0;
   reg [ 7:0] length_preset;
   reg [10:0] timer = 0;
-  reg [ 4:0] sequencer = 0;
+  reg length_halt = 0;
   reg linear_reload = 0;
   reg timer_event = 0;
-  reg length_halt = 0;
-  reg linear_count_zero;
+
   reg length_count_zero;
-  reg timer_count_zero;
+  reg linear_count_zero;
   reg sequencer_count_zero;
+  reg timer_count_zero;
 
   always @* begin : triangle_comb
-    linear_count_zero    <= ( linear_counter == 0 );
     length_count_zero    <= ( length_counter == 0 );
-    timer_count_zero     <= ( timer == 0 );
+    linear_count_zero    <= ( linear_counter == 0 );
     sequencer_count_zero <= ( sequencer == 0 );
+    timer_count_zero     <= ( timer == 0 );
   end
 
   // Select active counter
@@ -74,7 +75,7 @@ module triangle (
   always @( posedge clk ) begin : triangle_linear_counter
     if ( linear_reload || ( enable_240hz && linear_count_zero && length_halt ))
       linear_counter <= linear_preset;
-    else if ( enable_240hz && !linear_count_zero ) 
+    else if ( enable_240hz && !linear_count_zero )
       linear_counter <= linear_counter - 1;
   end
 
@@ -93,7 +94,7 @@ module triangle (
       end
     end
   end
-  
+
   always @* begin : triangle_length_lookup
     case ( length_select )
        0: length_preset = 8'h0A;
