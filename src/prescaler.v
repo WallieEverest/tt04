@@ -23,8 +23,8 @@ module prescaler #(
   output reg  uart_clk = 0   // 5x baud rate, 48 kHz
 );
 
-  localparam [2:0] APU_DIVISOR = OSCRATE / APURATE;  // 1.79 MHz => 6.7
-  localparam [7:0] UART_DIVISOR = OSCRATE / BAUDRATE / 5;  // 250: 9600 baud => 48,000 Hz
+  localparam APU_DIVISOR = (OSCRATE / APURATE);  // 1.79 MHz => 6.7
+  localparam UART_DIVISOR = (OSCRATE / BAUDRATE / 5);  // 250: 9600 baud => 48,000 Hz
 
   reg rx_meta = 0;
   reg sdi = 0;
@@ -48,14 +48,14 @@ module prescaler #(
     if ( count_clk != 0 )
       count_clk <= count_clk-1;
     else
-      count_clk <= APU_DIVISOR-1;
+      count_clk <= APU_DIVISOR[2:0]-1;
 
     if ( count_baud != 0 )
       count_baud <= count_baud-1;
     else
-      count_baud <= UART_DIVISOR-1;
+      count_baud <= UART_DIVISOR[7:0]-1;
 
-    if ( count_baud < UART_DIVISOR/2 )
+    if ( count_baud < UART_DIVISOR[7:0] / 2 )
       uart_clk <= 1;
     else
       uart_clk <= 0;

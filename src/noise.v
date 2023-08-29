@@ -34,7 +34,7 @@ module noise (
 
   // Input assignments
   wire [ 3:0] envelope         = reg_400C[3:0];
-  wire        constant_volume  = reg_400C[4];  // DEBUG
+  // wire        constant_volume  = reg_400C[4];  // DEBUG
   wire        length_halt      = reg_400C[5];
   wire [ 3:0] timer_select     = reg_400E[3:0];
   wire        mode_flag        = reg_400E[7];
@@ -47,18 +47,11 @@ module noise (
   reg timer_event = 0;
 
   reg [ 7:0] length_preset;
-  reg feedback;
-  reg length_count_zero;
-  reg timer_count_zero;
 
-  always @* begin : noise_comb
-    length_count_zero <= ( length_counter == 0 );
-    timer_count_zero  <= ( timer == 0 );
-    if ( mode_flag )
-      feedback <= shift_register[6] ^ shift_register[0];
-    else
-      feedback <= shift_register[1] ^ shift_register[0];
-  end
+  wire length_count_zero = ( length_counter == 0 );
+  wire timer_count_zero  = ( timer == 0 );
+  wire feedback = mode_flag ? shift_register[6] ^ shift_register[0]
+                            : shift_register[1] ^ shift_register[0];
 
   // Linear Feedback Shift Register
   always @( posedge clk ) begin : noise_lfsr

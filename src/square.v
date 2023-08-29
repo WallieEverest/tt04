@@ -56,24 +56,14 @@ module square (
   reg [10:0] timer_load = 0;
   reg timer_event = 0;
 
-  reg [ 3:0] volume;
-  reg [ 0:7] duty_cycle_pattern;
+  reg [ 7:0] duty_cycle_pattern;
   reg [ 7:0] length_preset;
-  reg [11:0] preset_decrement;
-  reg [11:0] preset_increment;
-  reg length_count_zero;
-  reg mute;
 
-  always @* begin : square_comb
-    length_count_zero <= ( length_counter == 0 );
-    preset_decrement  <= {1'b0, timer_load} - (timer_preset >> sweep_shift);
-    preset_increment  <= {1'b0, timer_load} + (timer_preset >> sweep_shift);
-    mute              <= ( preset_increment[11] || preset_decrement[11] || (timer_load[10:3] == 0) );
-    if ( decay_halt )
-      volume <= decay_rate;
-    else
-      volume <= envelope_counter;
-  end
+  wire [11:0] preset_decrement = {1'b0, timer_load} - ({1'b0, timer_preset} >> sweep_shift);
+  wire [11:0] preset_increment = {1'b0, timer_load} + ({1'b0, timer_preset} >> sweep_shift);
+  wire [ 3:0] volume = decay_halt ? decay_rate : envelope_counter;
+  wire length_count_zero = ( length_counter == 0 );
+  wire mute = ( preset_increment[11] || preset_decrement[11] || (timer_load[10:3] == 0) );
 
   // Length counter
   always @( posedge clk ) begin : square_length_counter
@@ -191,10 +181,10 @@ module square (
 
   always @* begin : square_duty_cycle_lookup
     case ( duty_cycle_type )
-      0: duty_cycle_pattern = 8'b00000001;
-      1: duty_cycle_pattern = 8'b00000011;
-      2: duty_cycle_pattern = 8'b00001111;
-      3: duty_cycle_pattern = 8'b11111100;
+      0: duty_cycle_pattern = 8'b10000000;
+      1: duty_cycle_pattern = 8'b11000000;
+      2: duty_cycle_pattern = 8'b11110000;
+      3: duty_cycle_pattern = 8'b00111111;
     endcase
   end
 

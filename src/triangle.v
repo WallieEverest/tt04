@@ -51,17 +51,9 @@ module triangle (
   reg linear_reload = 0;
   reg timer_event = 0;
 
-  reg length_count_zero;
-  reg linear_count_zero;
-  reg sequencer_count_zero;
-  reg timer_count_zero;
-
-  always @* begin : triangle_comb
-    length_count_zero    <= ( length_counter == 0 );
-    linear_count_zero    <= ( linear_counter == 0 );
-    sequencer_count_zero <= ( sequencer == 0 );
-    timer_count_zero     <= ( timer == 0 );
-  end
+  wire length_count_zero = ( length_counter == 0 );
+  wire linear_count_zero = ( linear_counter == 0 );
+  wire timer_count_zero = ( timer == 0 );
 
   // Select active counter
   always @( posedge clk ) begin : triangle_counter_select

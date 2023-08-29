@@ -17,6 +17,9 @@
 //   -------------------------------------------------------------------------
 //   | Start D0 D1 D2 D3 D4 D5 D6 0 Stop | Start D7 A0 A1 A2 A3 A4 A5 1 Stop |
 //   -------------------------------------------------------------------------
+//  To do:
+//    1.) Consider if powerup of shift register can cause an errant event.
+//    Possibly need to invert signal.
 
 `default_nettype none
 
@@ -41,7 +44,7 @@ module uart (
   reg [3:0] bit_count = 0;
   reg [6:0] data_hold = 0;
   wire [7:0] data = shift[8:1];  // serial byte
-  wire zero_count = (bit_count == 0);
+  wire zero_count = ( bit_count == 0 );
   wire msg_valid = ( shift[WIDTH-1] == STOP ) && ( shift[0] == START ) && zero_count;  // valid message
   wire sck = ( baud_count == 2 );  // recovered serial clock
 
