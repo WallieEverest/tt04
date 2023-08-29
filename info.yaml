@@ -31,7 +31,7 @@ documentation:
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
-    ChipTune implements an 8-bit Programmable Sound Generator.
+    ChipTune implements an 8-bit Programmable Sound Generator (PSG).
     Input is from a serial UART interface.
     Output is PWM audio.
 
