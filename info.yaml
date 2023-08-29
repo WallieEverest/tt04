@@ -23,8 +23,6 @@ yaml_version: 4
 
 # As everyone will have access to all designs, try to make it easy for someone new to your design to know what
 # it does and how to operate it. This info will be automatically collected and used to make a datasheet for the chip.
-#
-# Here is a great example: https://github.com/davidsiaw/tt02-davidsiaw-stackcalc/blob/38c5647f83aad2aec675d566aa3d67b98f0aac81/info.yaml
 documentation:
   author:      "Wallace Everest"
   title:       "ChipTune"
@@ -38,7 +36,13 @@ documentation:
     Output is PWM audio.
 
     ## Overview
-    This project replicates the Audio Processing Unit of vintage video games.
+    This project replicates the Audio Processing Unit (APU) of vintage video games.
+
+    ## Statistics
+    Tiles: 2x2
+    DFF: 400
+    Total Cells: 2200
+    Utilization: 31%
 
     ### TinyTapeout 4 Configuration
     TT04 devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in QFN-64 packages, mounted on a daughterboard for breakout.

@@ -2,7 +2,14 @@
 
 # Overview
 
-This project replicates the Audio Processing Unit of vintage video games.
+This project replicates the Audio Processing Unit (APU) of vintage video games.
+
+## Statistics
+
+Tiles: 2x2
+DFF: 400
+Total Cells: 2200
+Utilization: 31%
 
 ## TinyTapeout 4 Configuration
 
