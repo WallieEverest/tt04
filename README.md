@@ -2,7 +2,7 @@
 
 # Overview
 
-This project is an audio device that replicates the square-wave sound generators of vintage video games.
+This project replicates the Audio Processing Unit of vintage video games.
 
 ## TinyTapeout 4 Configuration
 
