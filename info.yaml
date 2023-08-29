@@ -1,4 +1,4 @@
---- 
+---
 # TinyTapeout project information
 project:
   wokwi_id: 0
@@ -25,7 +25,7 @@ yaml_version: 4
 # it does and how to operate it. This info will be automatically collected and used to make a datasheet for the chip.
 #
 # Here is a great example: https://github.com/davidsiaw/tt02-davidsiaw-stackcalc/blob/38c5647f83aad2aec675d566aa3d67b98f0aac81/info.yaml
-documentation: 
+documentation:
   author:      "Wallace Everest"
   title:       "ChipTune"
   language:    "Verilog"
@@ -33,17 +33,18 @@ documentation:
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
-    Chiptune implements an 8-bit Programmable Sound Generator.
+    ChipTune implements an 8-bit Programmable Sound Generator.
     Input is from a serial UART interface.
     Output is PWM audio.
 
-    ## The ChipTune Project
+    ## Overview
     This project is an audio device that replicates the square-wave, triangle, and noise generators of vintage video games.
 
     ### TinyTapeout 4 Configuration
     TT04 devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in QFN-64 packages in, mounted on a daughterboard for breakout.
 
     Based on data from:
+
     - https://github.com/efabless/caravel_board/blob/main/hardware/breakout/caravel-M.2-card-QFN/caravel-M.2-card-QFN.pdf
     - https://github.com/TinyTapeout/tt-multiplexer/blob/main/docs/INFO.md
     - https://open-source-silicon.slack.com/archives/C016N88BX44/p1688915892223379
@@ -105,11 +106,12 @@ documentation:
     - A byte with msb=1 is considered the second byte with the remaining 1-bit of data and a 6-bit address.
     - A ready flag is generated after receiving the second byte.
 
-    | Byte 1                            | Byte 2                            |
-    |-----------------------------------|-----------------------------------|
-    | Start D0 D1 D2 D3 D4 D5 D6 0 Stop | Start D7 A0 A1 A2 A3 A4 A5 1 Stop |
+    ```
+    Byte 1                             Byte 2
+    Start D0 D1 D2 D3 D4 D5 D6 0 Stop  Start D7 A0 A1 A2 A3 A4 A5 1 Stop
+    ```
 
-    ### ChipTune Pin Assignments
+    ### Pin Assignments
     | Signal       | Name     | Signal       | Name     |
     | ------------ | ---------| ------------ | ---------|
     | clk          | 12 MHz   | ena          | spare    |
@@ -130,7 +132,7 @@ documentation:
     - CLK is a 12 MHz clock used by the UART and APU_REF prescaler
     - LINK is an LED activity indicator of the RX signal
     - PWM is the pulse-width modulated audio output
-    - RST_N is an active-low reset           
+    - RST_N is an active-low reset
     - RX is a UART input (9600,8,N,1)
     - TX is a loopback signal from RX
 
@@ -169,7 +171,7 @@ documentation:
     ```
 
 # A description of what the inputs do (e.g. red button, SPI CLK, SPI MOSI, etc).
-  inputs:  
+  inputs:
     - None
     - None
     - RX

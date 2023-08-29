@@ -1,6 +1,6 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg)
 
-# The ChipTune Project
+# Overview
 
 This project is an audio device that replicates the square-wave sound generators of vintage video games.
 
@@ -11,6 +11,7 @@ This project is an audio device that replicates the square-wave sound generators
 TT04 devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in QFN-64 packages in, mounted on a daughterboard for breakout.
 
 Based on data from:
+
 - https://github.com/efabless/caravel_board/blob/main/hardware/breakout/caravel-M.2-card-QFN/caravel-M.2-card-QFN.pdf
 - https://github.com/TinyTapeout/tt-multiplexer/blob/main/docs/INFO.md
 - https://open-source-silicon.slack.com/archives/C016N88BX44/p1688915892223379
@@ -73,11 +74,12 @@ Only the lower 4-bits of the address are decoded.
 - A byte with msb=1 is considered the second byte with the remaining 1-bit of data and a 6-bit address.
 - A ready flag is generated after receiving the second byte.
 
-| Byte 1                            | Byte 2                            |
-|-----------------------------------|-----------------------------------|
-| Start D0 D1 D2 D3 D4 D5 D6 0 Stop | Start D7 A0 A1 A2 A3 A4 A5 1 Stop |
+```
+Byte 1                             Byte 2
+Start D0 D1 D2 D3 D4 D5 D6 0 Stop  Start D7 A0 A1 A2 A3 A4 A5 1 Stop
+```
 
-### ChipTune Pin Assignments
+### Pin Assignments
 | Signal       | Name     | Signal       | Name     |
 | ------------ | ---------| ------------ | ---------|
 | clk          | 12 MHz   | ena          | spare    |
@@ -127,7 +129,7 @@ The following serial strings will activate example functions
 ## Inputs
 - APU_CLK is a nominal 1.79 MHz clock used by the APU
 - CLK is a 12 MHz clock used by the UART and APU_REF prescaler
-- RST_N is an active-low reset           
+- RST_N is an active-low reset
 - RX is a UART input (9600,8,N,1)
 
 ## Outputs
