@@ -32,8 +32,7 @@ module fpga_top (
   wire blink;
   wire link;
   wire pwm;
-  wire rst_n = dtrn;
-  wire apu_clk = ui_in[1];      // APU clock
+  wire apu_clk = ui_in[1];      // APU clock, 1.79 MHz (typ)
 
   assign led[0] = blink;        // D1, 1 Hz blink
   assign led[1] = link;         // D3, RX activity status
@@ -43,7 +42,7 @@ module fpga_top (
                && ( ui_in[0] == 0 );  // D5, power (center green LED)
   assign uo_out[0] = 0;
   assign uo_out[1] = 0;
-  assign uo_out[2] = apu_ref;   // 1.79 MHz clock output, connect to ui_in[1]
+  assign uo_out[2] = apu_ref;   // 2 MHz clock reference, connect to ui_in[1]
   assign uo_out[3] = pwm;       // PWM audio output
   assign uo_out[4] = 0;
   assign uo_out[5] = 0;
@@ -55,9 +54,8 @@ module fpga_top (
     .OSCRATE(OSCRATE),
     .BAUDRATE(BAUDRATE)
   ) apu_inst (
-    .clk    (clk),
-    .rst_n  (rst_n),
     .apu_clk(apu_clk),
+    .clk    (clk),
     .rx     (rx),
     .apu_ref(apu_ref),
     .blink  (blink),

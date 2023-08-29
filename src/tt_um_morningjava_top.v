@@ -32,7 +32,7 @@ module tt_um_morningjava_top (
   wire link;
   wire pwm;
   wire rx = ui_in[2];          // UART RX
-  wire apu_clk = ui_in[7];     // APU clock
+  wire apu_clk = ui_in[7];     // APU clock, 1.79 MHz (typ)
 
   assign uo_out[0] = blink;    // 1 Hz blink
   assign uo_out[1] = 0;
@@ -41,7 +41,7 @@ module tt_um_morningjava_top (
   assign uo_out[4] = link;     // RX activity status
   assign uo_out[5] = 0;
   assign uo_out[6] = 0;
-  assign uo_out[7] = apu_ref;  // 1.79 MHz
+  assign uo_out[7] = apu_ref;  // 2 MHz clock reference, connect to ui_in[7]
   assign uio_out = 0;
   assign uio_oe = 0;
 
@@ -49,9 +49,8 @@ module tt_um_morningjava_top (
     .OSCRATE(OSCRATE),
     .BAUDRATE(BAUDRATE)
   ) apu_inst (
-    .clk    (clk),
-    .rst_n  (rst_n),
     .apu_clk(apu_clk),
+    .clk    (clk),
     .rx     (rx),
     .apu_ref(apu_ref),
     .blink  (blink),

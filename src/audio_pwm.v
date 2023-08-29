@@ -10,10 +10,9 @@
 `default_nettype none
 
 module audio_pwm #(
-  parameter WIDTH = 12
+  parameter WIDTH = 6
 )(
   input  wire clk,
-  input  wire reset,
   input  wire [WIDTH-1:0] data,  // unsigned input
   output wire pwm
 );
@@ -24,10 +23,7 @@ module audio_pwm #(
 
   // Delta-modulation function
   always @(posedge clk) begin : audio_pwm_accumulator
-    if (reset == 1)
-      accum <= 0;
-    else
-      accum <= {1'b0, accum[WIDTH-1:0]} + data_ext;
+    accum <= {1'b0, accum[WIDTH-1:0]} + data_ext;
   end
 
 endmodule

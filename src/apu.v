@@ -16,7 +16,6 @@ module apu #(
 )(
   input  wire apu_clk,  // APU clock
   input  wire clk,      // external oscillator
-  input  wire rst_n,    // asynchronous reset
   input  wire rx,       // serial data
   output wire apu_ref,  // 1.79 MHz
   output wire blink,    // status LED
@@ -40,8 +39,6 @@ module apu #(
   wire [3:0] uart_addr;
   wire [7:0] uart_data;
   wire uart_ready;
-  reg reset /* synthesis syn_preserve=1 */;
-  reg reset_meta;
 
   genvar i;
   for (i=0; i<=15; i=i+1) assign reg_array[i] = reg_data[8*i+7:8*i];
@@ -70,16 +67,19 @@ module apu #(
   );
 
   // *** APU Clock Domain ***
+
   // Synchronize external reset to clock
-  always @(posedge apu_clk) begin
-    if (rst_n == 0) begin
-      reset <= 1;
-      reset_meta <= 1;
-    end else begin
-      reset <= reset_meta;
-      reset_meta <= 0;
-    end
-  end
+  // reg reset;
+  // reg reset_meta;
+  // always @(posedge apu_clk) begin
+  //   if (rst_n == 0) begin
+  //     reset <= 1;
+  //     reset_meta <= 1;
+  //   end else begin
+  //     reset <= reset_meta;
+  //     reset_meta <= 0;
+  //   end
+  // end
 
   registers registers_inst (
     .clk       (apu_clk),
@@ -152,7 +152,6 @@ module apu #(
     .WIDTH(6)
   ) audio_pwm_inst (
     .clk  (apu_clk),
-    .reset(reset),
     .data (pwm_data),
     .pwm  (pwm)
   );
