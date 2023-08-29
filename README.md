@@ -8,7 +8,7 @@ This project is an audio device that replicates the square-wave sound generators
 
 ![Top Level Drawing](image/tt04.svg)
 
-TT04 devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in QFN-64 packages in, mounted on a daughterboard for breakout.
+TT04 devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in QFN-64 packages, mounted on a daughterboard for breakout.
 
 Based on data from:
 
@@ -66,6 +66,7 @@ Configurable parameters are the frequency, duty cycle, sweep, decay, and note du
 
 An explanation of register functions can be found on the NESDEV website.
 Only the lower 4-bits of the address are decoded.
+
 - https://www.nesdev.org/wiki/APU
 
 ### UART Operation

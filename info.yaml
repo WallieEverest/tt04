@@ -41,7 +41,7 @@ documentation:
     This project is an audio device that replicates the square-wave, triangle, and noise generators of vintage video games.
 
     ### TinyTapeout 4 Configuration
-    TT04 devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in QFN-64 packages in, mounted on a daughterboard for breakout.
+    TT04 devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in QFN-64 packages, mounted on a daughterboard for breakout.
 
     Based on data from:
 
@@ -98,6 +98,7 @@ documentation:
 
     An explanation of register functions can be found on the NESDEV website.
     Only the lower 4-bits of the address are decoded.
+
     - https://www.nesdev.org/wiki/APU
 
     ### UART Operation
@@ -135,9 +136,6 @@ documentation:
     - RST_N is an active-low reset
     - RX is a UART input (9600,8,N,1)
     - TX is a loopback signal from RX
-
-    ### Summary
-    An external serial port can play music through this TT04 project.
 
 # Instructions on how someone could test your project, include things like what buttons do what and how to set the clock if needed
   how_to_test: |
