@@ -38,7 +38,7 @@ documentation:
     Output is PWM audio.
 
     ## Overview
-   This project replicates the Audio Processing Unit of vintage video games.
+    This project replicates the Audio Processing Unit of vintage video games.
 
     ### TinyTapeout 4 Configuration
     TT04 devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in QFN-64 packages, mounted on a daughterboard for breakout.
