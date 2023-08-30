@@ -15,8 +15,10 @@
 
 module tt_um_morningjava_top (
   input  wire       clk,      // clock
+  /* verilator lint_off UNUSEDSIGNAL */
   input  wire       rst_n,    // active-low asynchronous reset
   input  wire       ena,      // (unused) active-high design is selected
+  /* verilator lint_on UNUSEDSIGNAL */
   input  wire [7:0] ui_in,    // Dedicated inputs
   input  wire [7:0] uio_in,   // Bidirectional input
   output wire [7:0] uo_out,   // Dedicated outputs
