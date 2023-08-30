@@ -18,9 +18,9 @@ module tt_um_morningjava_top (
   /* verilator lint_off UNUSEDSIGNAL */
   input  wire       rst_n,    // active-low asynchronous reset
   input  wire       ena,      // (unused) active-high design is selected
+  input  wire [7:0] uio_in,   // Bidirectional input
   /* verilator lint_on UNUSEDSIGNAL */
   input  wire [7:0] ui_in,    // Dedicated inputs
-  input  wire [7:0] uio_in,   // Bidirectional input
   output wire [7:0] uo_out,   // Dedicated outputs
   output wire [7:0] uio_out,  // Bidirectional output
   output wire [7:0] uio_oe    // Bidirectional enable (active-high: 0=input, 1=output)
