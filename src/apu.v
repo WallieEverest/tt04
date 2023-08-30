@@ -67,20 +67,6 @@ module apu #(
   );
 
   // *** APU Clock Domain ***
-
-  // Synchronize external reset to clock
-  // reg reset;
-  // reg reset_meta;
-  // always @(posedge apu_clk) begin
-  //   if (rst_n == 0) begin
-  //     reset <= 1;
-  //     reset_meta <= 1;
-  //   end else begin
-  //     reset <= reset_meta;
-  //     reset_meta <= 0;
-  //   end
-  // end
-
   registers registers_inst (
     .clk       (apu_clk),
     .uart_addr (uart_addr),

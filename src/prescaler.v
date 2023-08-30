@@ -18,7 +18,7 @@ module prescaler #(
   input  wire clk,           // external oscillator
   input  wire rx,            // serial input data
   output reg  apu_clk = 0,   // APU system clock
-  output reg  blink = 0,     // 1 Hz
+  output wire blink,         // 1 Hz
   output reg  link = 0,      // serial activity
   output reg  uart_clk = 0   // 5x baud rate, 48 kHz
 );
@@ -36,6 +36,9 @@ module prescaler #(
   reg [ 7:0] count_link = 0;
   reg event_4khz = 0;
   reg event_2hz = 0;
+  reg blink_i = 0;
+  
+  assign blink = blink_i;
 
   always @( posedge clk ) begin
     rx_meta      <= rx;       // capture asynchronous input
@@ -69,7 +72,7 @@ module prescaler #(
     end
 
     if ( event_4khz && event_2hz )
-      blink <= ~blink;  // toggle LED at 1 Hz
+      blink_i <= ~blink_i;  // toggle LED at 1 Hz
 
     if ( sdi_delay[1] != sdi_delay[0] )
       count_link <= ~0;
