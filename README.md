@@ -7,9 +7,9 @@ This project replicates the Audio Processing Unit (APU) of vintage video games.
 ## Statistics
 
 - Tiles: 2x2
-- DFF: 400
-- Total Cells: 2200
-- Utilization: 31%
+- DFF: 388
+- Total Cells: 2366
+- Utilization: 30%
 
 ## TinyTapeout 4 Configuration
 
@@ -91,15 +91,15 @@ Start D0 D1 D2 D3 D4 D5 D6 0 Stop  Start D7 A0 A1 A2 A3 A4 A5 1 Stop
 | Signal       | Name     | Signal       | Name     |
 | ------------ | ---------| ------------ | ---------|
 | clk          | 12 MHz   | ena          | spare    |
-| rst_n        | reset_n  | uio_oe[7:0]  | spare    |
-| ui_in[0]     | spare    | uo_out[0]    | blink    |
+| rst_n        | spare    | uio_oe[7:0]  | spare    |
+| ui_in[0]     | spare    | uo_out[0]    | spare    |
 | ui_in[1]     | spare    | uo_out[1]    | spare    |
 | ui_in[2]     | rx       | uo_out[2]    | tx       |
 | ui_in[3]     | spare    | uo_out[3]    | pwm      |
-| ui_in[4]     | spare    | uo_out[4]    | link     |
+| ui_in[4]     | spare    | uo_out[4]    | spare    |
 | ui_in[5]     | spare    | uo_out[5]    | spare    |
-| ui_in[6]     | spare    | uo_out[6]    | spare    |
-| ui_in[7]     | apu_clk  | uo_out[7]    | apu_ref  |
+| ui_in[6]     | spare    | uo_out[6]    | blink    |
+| ui_in[7]     | spare    | uo_out[7]    | link     |
 | uio_in[7:0]  | spare    | uio_out[7:0] | spare    |
 
 ## How to test
@@ -135,13 +135,10 @@ The following serial strings will activate example functions
 ```
 
 ## Inputs
-- APU_CLK is a nominal 1.79 MHz clock used by the APU
-- CLK is a 12 MHz clock used by the UART and APU_REF prescaler
-- RST_N is an active-low reset
+- CLK is a 1.789733 MHz clock
 - RX is a UART input (9600,8,N,1)
 
 ## Outputs
-- APU_REF is a 2 MHz clock output that may be connected to the APU_CLK
 - BLINK is an LED status indicator with a 1 Hz rate
 - LINK is an LED activity indicator of the RX signal
 - PWM is the pulse-width modulated audio output
