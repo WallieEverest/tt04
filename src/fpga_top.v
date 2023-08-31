@@ -33,7 +33,7 @@ module fpga_top (
   assign led[1] = link;            // D3, RX activity status
   assign led[2] = dtrn;            // D2, DTRn from COM
   assign led[3] = rtsn;            // D4, RTSn from COM
-  assign led[4] = ( ui_in == 0 );  // D5, power (center green LED)
+  assign led[4] = ( ui_in != 0 );  // D5, power (center green LED)
   assign uo_out[0] = 0;
   assign uo_out[1] = 0;
   assign uo_out[2] = 0;

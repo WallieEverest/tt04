@@ -30,10 +30,10 @@ module system #(
   reg [ 1:0] sdi_delay;
   reg [ 5:0] count_baud;
   reg [10:0] count_1khz;
-  reg [10:0] count_1hz;
+  reg [ 9:0] count_1hz;
   reg [ 4:0] count_link;
   
-  assign blink = count_1hz[10];  // toggle LED at 1 Hz
+  assign blink = count_1hz[9];  // toggle LED at 1 Hz
 
   always @( posedge clk ) begin
     rx_meta      <= rx;       // capture asynchronous input
