@@ -36,14 +36,11 @@ module a_tb_fpga_top ();
   reg  clk = 0;
   reg  sck = 0;
   wire dtrn = 1;
-  wire rtsn = 0;
+  wire rtsn = 1;
   wire [7:0] ui_in;
   wire [7:0] uo_out;
   wire rx = message[0];
-  wire apu_clk = uo_out[2];
-  assign ui_in[0] = 0;
-  assign ui_in[1] = apu_clk;
-  assign ui_in[7:2] = 0;
+  assign ui_in = 0;
 
   tb_audio_pwm tb_audio_pwm_inst (
     .pwm(uo_out[3])

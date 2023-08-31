@@ -6,23 +6,10 @@
 // License: Apache 2.0
 //
 // Description:
-//   Uses Verilog-2001 array features
-//
 //   Decodes serial bytes onto a register array
 //
-//   Byte format
-//   Bit Description
-//    7  Bank
-//    6  Addr[2]
-//    5  Addr[1]
-//    4  Addr[0]
-//    3  Data[3]
-//    2  Data[2]
-//    1  Data[1]
-//    0  Data[0]
-//
 //   The 16 byte register array is configured as four banks of four registers each.
-//   One bit in reg_event[] is pulsed after receiving the top register in a bank.
+//   One bit in reg_event[] is pulsed after receiving the top register in each bank.
 
 `default_nettype none
 
@@ -35,13 +22,11 @@ module registers (
   output reg  [3:0] reg_event = 0
 );
 
-  reg uart_meta = 0;  // asynchronous clock crossing
   reg [1:0] edge_detect = 0;
   wire uart_event = ( edge_detect == 2'b01 );  // rising edge of uart ready
 
   always @( posedge clk ) begin : registers_decode
-    uart_meta <= uart_ready;
-    edge_detect <= {edge_detect[0], uart_meta};
+    edge_detect <= {edge_detect[0], uart_ready};
 
     if ( uart_event ) begin   // capture inbound data
       reg_data[8*uart_addr+0] <= uart_data[0];
@@ -59,4 +44,5 @@ module registers (
     else
       reg_event <= 4'h0;
   end
+  
 endmodule

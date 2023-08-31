@@ -12,73 +12,23 @@
 
 module prescaler #(
   parameter OSCRATE = 12_000_000,  // oscillator clock frequency
-  parameter BAUDRATE = 9600,       // serial data rate
   parameter APURATE = 1_790_000    // system clock frequency
 )(
-  input  wire clk,           // external oscillator
-  input  wire rx,            // serial input data
-  output reg  apu_clk = 0,   // APU system clock
-  output wire blink,         // 1 Hz
-  output reg  link = 0,      // serial activity
-  output reg  uart_clk = 0   // 5x baud rate, 48 kHz
+  input  wire clk,     // external oscillator
+  output reg  apu_clk  // APU system clock
 );
 
-  localparam APU_DIVISOR = (OSCRATE / APURATE);  // 1.79 MHz => 6.7
-  localparam UART_DIVISOR = (OSCRATE / BAUDRATE / 5);  // 250: 9600 baud => 48,000 Hz
+  localparam [2:0] APU_DIVISOR = (OSCRATE / APURATE);  // 1.79 MHz => 6.7
 
-  reg rx_meta = 0;
-  reg sdi = 0;
-  reg [ 1:0] sdi_delay = 0;
-  reg [ 2:0] count_clk = 0 /* synthesis syn_preserve=1 */;
-  reg [ 7:0] count_baud = 0 /* synthesis syn_preserve=1 */;
-  reg [11:0] count_4khz = 0;
-  reg [10:0] count_2hz = 0;
-  reg [ 7:0] count_link = 0;
-  reg event_4khz = 0;
-  reg event_2hz = 0;
-  reg blink_i = 0;
-  
-  assign blink = blink_i;
+  reg [ 2:0] count_clk;
 
   always @( posedge clk ) begin
-    rx_meta      <= rx;       // capture asynchronous input
-    sdi          <= rx_meta;  // align input to the system clock
-    sdi_delay[0] <= sdi;      // asyncronous input
-    sdi_delay[1] <= sdi_delay[0];
-    apu_clk      <= ( count_clk < 3 );  // extend clock duration
-    link         <= ( count_link != 0 );  // show RX activity
+    apu_clk <= ( count_clk < 3 );  // extend clock duration
 
     if ( count_clk != 0 )
       count_clk <= count_clk-1;
     else
-      count_clk <= APU_DIVISOR[2:0]-1;
-
-    if ( count_baud != 0 )
-      count_baud <= count_baud-1;
-    else
-      count_baud <= UART_DIVISOR[7:0]-1;
-
-    if ( count_baud < UART_DIVISOR[7:0] / 2 )
-      uart_clk <= 1;
-    else
-      uart_clk <= 0;
-
-    event_4khz <= ( count_4khz == 1 );  // 4 kHz clock
-    count_4khz <= ( event_4khz ) ? 3000-1 : count_4khz-1;
-
-    if ( event_4khz ) begin
-      event_2hz <= ( count_2hz == 1 );  // 2 Hz clock
-      count_2hz <= ( event_2hz ) ? 2000-1 : count_2hz-1;
-    end
-
-    if ( event_4khz && event_2hz )
-      blink_i <= ~blink_i;  // toggle LED at 1 Hz
-
-    if ( sdi_delay[1] != sdi_delay[0] )
-      count_link <= ~0;
-    else
-      if ( event_4khz && ( count_link != 0 ))
-        count_link <= count_link-1;
+      count_clk <= APU_DIVISOR-1;
   end
 
 endmodule

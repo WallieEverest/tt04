@@ -6,9 +6,9 @@ project:
     - audio_pwm.v
     - frame.v
     - noise.v
-    - prescaler.v
     - registers.v
     - square.v
+    - system.v
     - triangle.v
     - uart.v
     - apu.v
@@ -210,5 +210,5 @@ documentation:
   external_hw: "Computer COM port"
   discord:     "morningjava"
   doc_link:    "https://github.com/WallieEverest/tt04/blob/main/README.md"
-  clock_hz:    12000000  # Clock frequency in Hz
+  clock_hz:    1789773  # Clock frequency in Hz
   picture:     "./image/tt04.png"

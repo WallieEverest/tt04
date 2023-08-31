@@ -8,7 +8,7 @@
 `default_nettype none
 `timescale 1ns/100ps
 
-module a_tb_morning_java_top ();
+module a_tb_morningjava_top ();
   localparam WIDTH = 10;  // number of bits in message
   localparam DELAY = WIDTH+0; // assume two stop bits
   localparam [WIDTH-1:0] IDLE = ~0;
@@ -26,11 +26,9 @@ module a_tb_morning_java_top ();
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
   wire rx = message[0];
-  wire apu_clk = uo_out[7];
   assign ui_in[1:0] = 0;
   assign ui_in[2] = rx;
-  assign ui_in[6:3] = 0;
-  assign ui_in[7] = apu_clk;
+  assign ui_in[7:3] = 0;
 
   tb_audio_pwm tb_audio_pwm_inst (
     .pwm(uo_out[3])
@@ -47,7 +45,7 @@ module a_tb_morning_java_top ();
     .uio_oe (uio_oe)
   );
 
-  initial forever #41.7ns clk = ~clk;  // 12 MHz system clock
+  initial forever #279.4ns clk = ~clk;  // 1.79 MHz system clock
   initial forever #52083ns sck = ~sck;  // 9,600 baud UART
 
   initial begin

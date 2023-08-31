@@ -6,24 +6,20 @@
 // License: Apache 2.0
 //
 // Description: The instructions set is similar to an enhanced 6502 with
-// an Audio Processing Unit (APU), designated the RP2A03 found in NTSC Nintendo consoles.
+// an Audio Processing Unit (APU), designated the RP2A03 found in the Nintendo Entertainment System.
 
 `default_nettype none
 
 module apu #(
-  parameter OSCRATE = 12_000_000,  // external oscillator
-  parameter BAUDRATE = 9600        // serial baud rate
+  parameter CLKRATE = 1_789_773,  // APU clock frequency, 21.477 MHz/12 or 1.89 GHz/88/12
+  parameter BAUDRATE = 9600       // serial baud rate
 )(
-  input  wire apu_clk,  // APU clock
-  input  wire clk,      // external oscillator
-  input  wire rx,       // serial data
-  output wire apu_ref,  // 1.79 MHz
-  output wire blink,    // status LED
-  output wire link,     // link LED
-  output wire pwm       // audio PWM
+  input  wire clk,    // APU clock
+  input  wire rx,     // serial data
+  output wire blink,  // status LED
+  output wire link,   // link LED
+  output wire pwm     // audio PWM
 );
-
-  localparam CLKRATE = 1_790_000;  // APU system clock
 
   wire uart_clk;      // 48 kHz
   wire enable_240hz;  // 240 Hz
@@ -41,34 +37,30 @@ module apu #(
   wire uart_ready;
 
   genvar i;
-  for (i=0; i<=15; i=i+1) assign reg_array[i] = reg_data[8*i+7:8*i];
+  for ( i=0; i<=15; i=i+1 ) assign reg_array[i] = reg_data[8*i+7:8*i];
 
-  // *** OSC Clock Domain ***
-  prescaler #(
-    .OSCRATE(OSCRATE),    // oscillator frequency
-    .BAUDRATE(BAUDRATE),  // baud rate
-    .APURATE(1_790_000)   // system clock frequency
-  ) prescaler_inst (
+  system #(
+    .CLKRATE(CLKRATE),
+    .BAUDRATE(BAUDRATE)   // baud rate
+  ) system_inst (
     .clk     (clk),       // system oscillator
     .rx      (rx),        // serial input for activity indicator
-    .apu_clk (apu_ref),   // APU system clock, ~1.79 MHz
     .blink   (blink),     // 1 Hz blink indicator
     .link    (link),      // activity indicator
     .uart_clk(uart_clk)   // 5x UART clock, 48 kHz
   );
 
-  // *** UART Clock Domain ***
   uart uart_inst (
-    .clk       (uart_clk),
+    .clk       (clk),
+    .uart_clk  (uart_clk),
     .rx        (rx),
     .uart_addr (uart_addr),
     .uart_data (uart_data),
     .uart_ready(uart_ready)
   );
 
-  // *** APU Clock Domain ***
   registers registers_inst (
-    .clk       (apu_clk),
+    .clk       (clk),
     .uart_addr (uart_addr),
     .uart_data (uart_data),
     .uart_ready(uart_ready),
@@ -79,13 +71,13 @@ module apu #(
   frame #(
     .CLKRATE(CLKRATE)
   ) frame_inst (
-    .clk         (apu_clk),
+    .clk         (clk),
     .enable_240hz(enable_240hz),
     .enable_120hz(enable_120hz)
   );
 
   square square1_inst (
-    .clk         (apu_clk),
+    .clk         (clk),
     .enable_240hz(enable_240hz),
     .enable_120hz(enable_120hz),
     .reg_4000    (reg_array[4'h0]),
@@ -97,7 +89,7 @@ module apu #(
   );
 
   square square2_inst (
-    .clk         (apu_clk),
+    .clk         (clk),
     .enable_240hz(enable_240hz),
     .enable_120hz(enable_120hz),
     .reg_4000    (reg_array[4'h4]),
@@ -109,7 +101,7 @@ module apu #(
   );
 
   triangle triangle_inst (
-    .clk         (apu_clk),
+    .clk         (clk),
     .enable_240hz(enable_240hz),
     .reg_4008    (reg_array[4'h8]),
     .reg_400A    (reg_array[4'hA]),
@@ -119,7 +111,7 @@ module apu #(
   );
 
   noise noise_inst (
-    .clk         (apu_clk),
+    .clk         (clk),
     .enable_240hz(enable_240hz),
     .reg_400C    (reg_array[4'hC]),
     .reg_400E    (reg_array[4'hE]),
@@ -137,9 +129,9 @@ module apu #(
   audio_pwm #(
     .WIDTH(6)
   ) audio_pwm_inst (
-    .clk  (apu_clk),
-    .data (pwm_data),
-    .pwm  (pwm)
+    .clk (clk),
+    .data(pwm_data),
+    .pwm (pwm)
   );
 
 endmodule
