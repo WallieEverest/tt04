@@ -37,35 +37,32 @@ module triangle (
 );
 
   // Input assignments
-  wire [ 6:0]  linear_preset  = reg_4008[6:0];
-  wire         linear_control = reg_4008[7];
-  wire [ 10:0] timer_preset   = {reg_400B[2:0], reg_400A};
-  wire [ 4:0]  length_select  = reg_400B[7:3];
+  wire [ 6:0]  linear_preset = reg_4008[6:0];
+  wire         length_halt   = reg_4008[7];
+  wire [ 10:0] timer_preset  = {reg_400B[2:0], reg_400A};
+  wire [ 4:0]  length_select = reg_400B[7:3];
 
   reg [ 4:0] sequencer = 0;
   reg [ 6:0] linear_counter = 0;
   reg [ 7:0] length_counter = 0;
   reg [ 7:0] length_preset;
   reg [10:0] timer = 0;
-  reg length_halt = 0;
   reg linear_reload = 0;
   reg timer_event = 0;
 
   wire length_count_zero = ( length_counter == 0 );
+  wire linear_count_one  = ( linear_counter == 1 );
   wire linear_count_zero = ( linear_counter == 0 );
-  wire timer_count_zero = ( timer == 0 );
-
-  // Select active counter
-  always @( posedge clk ) begin : triangle_counter_select
-    if ( reg_event )
-      length_halt <= 1;
-    else if ( enable_240hz )
-      length_halt <= linear_control;
-  end
+  wire timer_count_zero  = ( timer == 0 );
 
   // Linear counter
   always @( posedge clk ) begin : triangle_linear_counter
-    if ( linear_reload || ( enable_240hz && linear_count_zero && length_halt ))
+    if ( reg_event )
+      linear_reload <= 1;
+    else if ( enable_240hz && !length_halt )
+      linear_reload <= 0;
+
+    if ( enable_240hz && ( linear_count_one || linear_reload ))
       linear_counter <= linear_preset;
     else if ( enable_240hz && !linear_count_zero )
       linear_counter <= linear_counter - 1;
@@ -73,18 +70,10 @@ module triangle (
 
   // Length counter
   always @( posedge clk ) begin : triangle_length_counter
-    if ( reg_event ) begin
+    if ( reg_event )
       length_counter <= length_preset;
-    end else begin
-      if ( !length_halt ) begin  // suspend while linear is in control
-        if ( enable_240hz && !length_count_zero ) begin
-          length_counter <= length_counter - 1;
-          linear_reload <= 1;
-        end else begin
-          linear_reload <= 0;
-        end
-      end
-    end
+    else if ( enable_240hz && !length_count_zero && !length_halt )  // suspend while linear is in control
+      length_counter <= length_counter - 1;
   end
 
   always @* begin : triangle_length_lookup

@@ -52,7 +52,7 @@ module square (
   reg [ 3:0] decay_counter = 0;
   reg [ 3:0] envelope_counter = 0;
   reg [ 7:0] length_counter = 0;
-  reg [10:0] timer = 0;
+  reg [11:0] timer = 0;
   reg [10:0] timer_load = 0;
   reg timer_event = 0;
 
@@ -157,13 +157,12 @@ module square (
 
   // Timer, ticks at 1.79 MHz / 2
   always @( posedge clk ) begin : square_timer  // originally at 1.79 MHz
-    if ( timer == 0 ) begin
-      timer <= timer_load;  // DEBUG reduce effective clock rate
-      timer_event <= 1;
-    end else begin
+    timer_event <= ( timer == 0 );
+
+    if ( timer == 0 )
+      timer <= {timer_load, 1'b0};  // double the timer period
+    else
       timer <= timer - 1;
-      timer_event <= 0;
-    end
   end
 
   // Duty cycle

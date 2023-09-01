@@ -63,6 +63,101 @@ module a_tb_fpga_top ();
   initial begin
     repeat (2) @(negedge sck);
 
+    // # Square 1
+    // 08 82 30 80 00 84 00 86 #Clear $30 $08 $00 $00
+    // 27 83 02 81 7E 85 08 86 #PlaySmallJump
+    // 27 83 02 81 7C 84 09 86 #PlayBigJump
+    // 13 83 1E 81 3A 84 0A 86 #PlayBump
+    // 19 83 1E 81 0A 84 08 86 #PlayFireballThrow
+    // 4B 83 1F 81 6F 85 08 86 #PlaySmackEnemy
+    // 1C 83 1E 81 7E 85 08 86 #PlaySwimStomp
+    // 08 82 3F 81 17 84 01 86 #400Hz $BF $08 $17 $01
+
+    message = {STOP,8'h08,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h82,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    message = {STOP,8'h3F,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h81,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    message = {STOP,8'h17,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h84,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    message = {STOP,8'h01,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h86,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    // # Square 2
+    // 30 88 08 8A 00 8C 00 8E #Clear $30 $08 $00 $00
+    // 18 89 7F 8A 71 8C 08 8E #PlayTimerTick
+    // 0D 89 7F 8A 71 8C 08 8E #PlayCoinGrab
+    // 1F 89 14 8B 79 8D 0A 8E #PlayBlast
+    // 7F 88 5D 8A 71 8C 08 8E #PlayPowerUpGrab
+    // 3F 89 08 8A 17 8C 01 8E #400Hz $BF $08 $17 $01
+
+    message = {STOP,8'h3F,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h89,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    message = {STOP,8'h08,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h8A,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    message = {STOP,8'h17,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h8C,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    message = {STOP,8'h01,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h8E,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    // # Triangle
+    // 00 91 00 94 00 96 #Clear $80 $00 $00
+    // 40 91 0B 95 00 96 #400Hz $C0 $8B $00
+
+    message = {STOP,8'h40,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h91,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    message = {STOP,8'h0B,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h95,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    message = {STOP,8'h00,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h96,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    // # Noise
+    // 30 98 00 9A 00 9C 00 9E #Clear $30 $00 $00 $00
+    // 05 9D 3F 98 #300Hz $3F $85
+
+    message = {STOP,8'h05,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h9D,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    message = {STOP,8'h3F,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+    message = {STOP,8'h98,START};
+    repeat (DELAY) @(negedge sck) message = {STOP, message[WIDTH-1:1]};
+
+    #20ms
+
+    #2000ms
+
     // SMBDIS.ASM
     // PlayBigJump:
     //  lda #$18

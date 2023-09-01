@@ -18,7 +18,7 @@ module frame #(
   output reg  enable_120hz   // 120 Hz
 );
 
-localparam [13:0] PRESCALE = (CLKRATE / 240);  // frame rate
+localparam PRESCALE = (CLKRATE / 240);  // frame rate
 
 reg [13:0] prescaler;  // size allows max system clock of 3.9 MHz
 reg divider = 0;
@@ -28,7 +28,7 @@ always @ ( posedge clk ) begin
   enable_240hz <= ( prescaler == 0 );
   enable_120hz <= ( divider && ( prescaler == 0 ));
   if ( prescaler != 0 )
-    prescaler <= prescaler - 1;
+    prescaler <= prescaler[13:0] - 1;
   else begin
     prescaler <= PRESCALE-1;
     divider <= ~divider;

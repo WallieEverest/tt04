@@ -21,8 +21,8 @@ module system #(
   output reg  uart_clk  // 6x baud rate, 57,600 Hz
 );
 
-  localparam [ 5:0] UART_DIVISOR = (CLKRATE / BAUDRATE / 6);  // 31: 9600 baud => 57,600 Hz
-  localparam [10:0] KHZ_DIVISOR  = (CLKRATE / 1000);  // 1789: 1000 Hz
+  localparam UART_DIVISOR = (CLKRATE / BAUDRATE / 6);  // 31: 9600 baud => 57,600 Hz
+  localparam KHZ_DIVISOR  = (CLKRATE / 1000);  // 1789: 1000 Hz
 
   reg event_1khz;
   reg rx_meta;
@@ -45,14 +45,14 @@ module system #(
     if ( count_baud != 0 )  // baud rate divisor
       count_baud <= count_baud-1;
     else
-      count_baud <= UART_DIVISOR-1;
+      count_baud <= UART_DIVISOR[5:0] - 1;
 
     uart_clk <= ( count_baud == 0 );
 
     if ( count_1khz != 0 )  // 1 kHz counter
       count_1khz <= count_1khz-1;
     else
-      count_1khz <= KHZ_DIVISOR - 1;
+      count_1khz <= KHZ_DIVISOR[10:0] - 1;
 
     event_1khz <= ( count_1khz == 0 );  // 1 kHz event
 
