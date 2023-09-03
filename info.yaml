@@ -41,9 +41,9 @@ documentation:
 
     ## Statistics
     - Tiles: 2x2
-    - DFF: 388
-    - Total Cells: 2366
-    - Utilization: 30%
+    - DFF: 417
+    - Total Cells: 2549
+    - Utilization: 32%
 
     ### TinyTapeout 4 Configuration
     TT04 devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in QFN-64 packages, mounted on a daughterboard for breakout.

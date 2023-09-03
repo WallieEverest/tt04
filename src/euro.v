@@ -8,7 +8,7 @@
 // Description:
 //   Generates a Euro character at the 60 Hz frame rate.
 //   Provides a synchronization pulse that aligns with the internal frame generator.
-//   Actual pulse is merely the serial word 8'b80 (the extended ASCII Euro character)
+//   Actual pulse is merely the serial word 8'b80 (Win1252 Euro character)
 //   which is eight low-periods of the serial bit rate (including the start bit).
 
 `default_nettype none
