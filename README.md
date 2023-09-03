@@ -92,14 +92,14 @@ Start D0 D1 D2 D3 D4 D5 D6 0 Stop  Start D7 A0 A1 A2 A3 A4 A5 1 Stop
 | ------------ | ---------| ------------ | ---------|
 | clk          | 12 MHz   | ena          | spare    |
 | rst_n        | spare    | uio_oe[7:0]  | spare    |
-| ui_in[0]     | spare    | uo_out[0]    | spare    |
-| ui_in[1]     | spare    | uo_out[1]    | spare    |
+| ui_in[0]     | spare    | uo_out[0]    | blink    |
+| ui_in[1]     | spare    | uo_out[1]    | link     |
 | ui_in[2]     | rx       | uo_out[2]    | tx       |
 | ui_in[3]     | spare    | uo_out[3]    | pwm      |
-| ui_in[4]     | spare    | uo_out[4]    | spare    |
-| ui_in[5]     | spare    | uo_out[5]    | spare    |
-| ui_in[6]     | spare    | uo_out[6]    | blink    |
-| ui_in[7]     | spare    | uo_out[7]    | link     |
+| ui_in[4]     | spare    | uo_out[4]    | square1  |
+| ui_in[5]     | spare    | uo_out[5]    | square2  |
+| ui_in[6]     | spare    | uo_out[6]    | triangle |
+| ui_in[7]     | spare    | uo_out[7]    | noise    |
 | uio_in[7:0]  | spare    | uio_out[7:0] | spare    |
 
 ## How to test
@@ -142,7 +142,7 @@ The following serial strings will activate example functions
 - BLINK is an LED status indicator with a 1 Hz rate
 - LINK is an LED activity indicator of the RX signal
 - PWM is the pulse-width modulated audio output
-- TX is a loopback signal from RX
+- TX generates a frame synchonization character (0x80)
 
 ## Bidirectional
 - None

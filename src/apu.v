@@ -14,23 +14,29 @@ module apu #(
   parameter CLKRATE = 1_789_773,  // APU clock frequency, 21.477 MHz/12 or 1.89 GHz/88/12
   parameter BAUDRATE = 9600       // serial baud rate
 )(
-  input  wire clk,    // APU clock
-  input  wire rx,     // serial data
-  output wire blink,  // status LED
-  output wire link,   // link LED
-  output wire pwm     // audio PWM
+  input  wire clk,       // APU clock
+  input  wire rx,        // serial input
+  output wire blink,     // status LED
+  output wire link,      // link LED
+  output wire noise,     // noise PWM
+  output wire square1,   // square1 PWM
+  output wire square2,   // square2 PWM
+  output wire pwm,       // merged audio PWM
+  output wire triangle,  // triangle PWM
+  output wire tx         // serial output
 );
 
-  wire uart_clk;      // 48 kHz
-  wire enable_240hz;  // 240 Hz
-  wire enable_120hz;  // 120 Hz
+  wire uart_clk;  // 48 kHz
+  wire enable_240hz;
+  wire enable_120hz;
+  wire enable_60hz;
   wire [16*8-1:0] reg_data;
   wire [7:0] reg_array [0:15];
   wire [3:0] reg_event;
-  wire [3:0] pulse1_out;
-  wire [3:0] pulse2_out;
-  wire [3:0] tri_out;
-  wire [3:0] noise_out;
+  wire [3:0] square1_data;
+  wire [3:0] square2_data;
+  wire [3:0] triangle_data;
+  wire [3:0] noise_data;
   wire [5:0] pwm_data;
   wire [3:0] uart_addr;
   wire [7:0] uart_data;
@@ -41,13 +47,13 @@ module apu #(
 
   system #(
     .CLKRATE(CLKRATE),
-    .BAUDRATE(BAUDRATE)   // baud rate
+    .BAUDRATE(BAUDRATE)
   ) system_inst (
-    .clk     (clk),       // system oscillator
-    .rx      (rx),        // serial input for activity indicator
-    .blink   (blink),     // 1 Hz blink indicator
-    .link    (link),      // activity indicator
-    .uart_clk(uart_clk)   // 5x UART clock, 48 kHz
+    .clk     (clk),
+    .rx      (rx),
+    .blink   (blink),
+    .link    (link),
+    .uart_clk(uart_clk)
   );
 
   uart uart_inst (
@@ -57,6 +63,13 @@ module apu #(
     .uart_addr (uart_addr),
     .uart_data (uart_data),
     .uart_ready(uart_ready)
+  );
+
+  euro euro_inst (
+    .clk        (clk),
+    .enable_60hz(enable_60hz),
+    .uart_clk   (uart_clk),
+    .tx         (tx) 
   );
 
   registers registers_inst (
@@ -73,7 +86,8 @@ module apu #(
   ) frame_inst (
     .clk         (clk),
     .enable_240hz(enable_240hz),
-    .enable_120hz(enable_120hz)
+    .enable_120hz(enable_120hz),
+    .enable_60hz (enable_60hz)
   );
 
   square square1_inst (
@@ -85,7 +99,7 @@ module apu #(
     .reg_4002    (reg_array[4'h2]),
     .reg_4003    (reg_array[4'h3]),
     .reg_event   (reg_event[0]),
-    .pulse_out   (pulse1_out)
+    .pulse_data  (square1_data)
   );
 
   square square2_inst (
@@ -97,17 +111,17 @@ module apu #(
     .reg_4002    (reg_array[4'h6]),
     .reg_4003    (reg_array[4'h7]),
     .reg_event   (reg_event[1]),
-    .pulse_out   (pulse2_out)
+    .pulse_data  (square2_data)
   );
 
   triangle triangle_inst (
-    .clk         (clk),
-    .enable_240hz(enable_240hz),
-    .reg_4008    (reg_array[4'h8]),
-    .reg_400A    (reg_array[4'hA]),
-    .reg_400B    (reg_array[4'hB]),
-    .reg_event   (reg_event[2]),
-    .tri_out     (tri_out)
+    .clk          (clk),
+    .enable_240hz (enable_240hz),
+    .reg_4008     (reg_array[4'h8]),
+    .reg_400A     (reg_array[4'hA]),
+    .reg_400B     (reg_array[4'hB]),
+    .reg_event    (reg_event[2]),
+    .triangle_data(triangle_data)
   );
 
   noise noise_inst (
@@ -117,14 +131,14 @@ module apu #(
     .reg_400E    (reg_array[4'hE]),
     .reg_400F    (reg_array[4'hF]),
     .reg_event   (reg_event[3]),
-    .noise_out   (noise_out)
+    .noise_data  (noise_data)
   );
 
   // Mixer
-  assign pwm_data = {2'b00, pulse1_out}
-                  + {2'b00, pulse2_out}
-                  + {2'b00, tri_out}
-                  + {2'b00, noise_out};
+  assign pwm_data = {2'b00, square1_data}
+                  + {2'b00, square2_data}
+                  + {2'b00, triangle_data}
+                  + {2'b00, noise_data};
 
   audio_pwm #(
     .WIDTH(6)
@@ -132,6 +146,38 @@ module apu #(
     .clk (clk),
     .data(pwm_data),
     .pwm (pwm)
+  );
+
+  audio_pwm #(
+    .WIDTH(4)
+  ) audio_square1_inst (
+    .clk (clk),
+    .data(square1_data),
+    .pwm (square1)
+  );
+
+  audio_pwm #(
+    .WIDTH(4)
+  ) audio_square2_inst (
+    .clk (clk),
+    .data(square2_data),
+    .pwm (square2)
+  );
+
+  audio_pwm #(
+    .WIDTH(4)
+  ) audio_triangle_inst (
+    .clk (clk),
+    .data(triangle_data),
+    .pwm (triangle)
+  );
+
+  audio_pwm #(
+    .WIDTH(4)
+  ) audio_noise_inst (
+    .clk (clk),
+    .data(noise_data),
+    .pwm (noise)
   );
 
 endmodule

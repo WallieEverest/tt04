@@ -32,7 +32,7 @@ module square (
   input wire [7:0] reg_4002,
   input wire [7:0] reg_4003,
   input wire       reg_event,
-  output reg [3:0] pulse_out = 0
+  output reg [3:0] pulse_data
 );
 
   // Input assignments
@@ -173,9 +173,9 @@ module square (
       index <= index - 1;
 
     if ( duty_cycle_pattern[index] && !mute && !length_count_zero)
-      pulse_out <= volume;
+      pulse_data <= volume;
     else
-      pulse_out <= 0;
+      pulse_data <= 0;
   end
 
   always @* begin : square_duty_cycle_lookup

@@ -17,13 +17,16 @@ module audio_pwm #(
   output wire pwm
 );
 
-  wire [WIDTH:0] data_ext = {1'b0, data};  // extend vector
-  reg [WIDTH:0] accum = 0;    // unsigned
-  assign pwm = accum[WIDTH];  // msb of the accumulator (OVF) is the PWM output
+  wire [WIDTH:0] data_ext = {1'b0, data};  // extend input vector
+  reg [WIDTH:0] accum;                     // unsigned accumulator
+  assign pwm = accum[WIDTH];               // msb of the accumulator (OVF) is the PWM output
 
   // Delta-modulation function
   always @(posedge clk) begin : audio_pwm_accumulator
-    accum <= {1'b0, accum[WIDTH-1:0]} + data_ext;
+    if ( accum != 0 )  // ensure startup value is non-zero
+      accum <= {1'b0, accum[WIDTH-1:0]} + data_ext;
+    else
+      accum <= 1;
   end
 
 endmodule

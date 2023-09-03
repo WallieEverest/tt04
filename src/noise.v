@@ -29,7 +29,7 @@ module noise (
   input wire [7:0] reg_400E,
   input wire [7:0] reg_400F,
   input wire       reg_event,
-  output reg [3:0] noise_out = 0
+  output reg [3:0] noise_data
 );
 
   // Input assignments
@@ -139,9 +139,9 @@ module noise (
   // Envelope
   always @( posedge clk ) begin : noise_envelope
     if ( length_count_zero || shift_register[0] )
-      noise_out <= 0;
+      noise_data <= 0;
     else
-      noise_out <= envelope;  // volume
+      noise_data <= envelope;  // volume
   end
 
 endmodule

@@ -33,7 +33,7 @@ module triangle (
   input wire [7:0] reg_400A,
   input wire [7:0] reg_400B,
   input wire       reg_event,
-  output reg [3:0] tri_out = 0
+  output reg [3:0] triangle_data
 );
 
   // Input assignments
@@ -125,9 +125,9 @@ module triangle (
   // Sequencer
   always @( posedge clk ) begin : triangle_sequencer
     if ( !sequencer[4] )
-      tri_out <= ~sequencer[3:0];  // count down for first half of sequencer count
+      triangle_data <= ~sequencer[3:0];  // count down for first half of sequencer count
     else
-      tri_out <= sequencer[3:0];  // count up for second half of sequencer count
+      triangle_data <= sequencer[3:0];  // count up for second half of sequencer count
 
     if ( timer_event && !linear_count_zero && !length_count_zero )  // DEBUG nasty logic width
       sequencer <= sequencer + 1;

@@ -24,26 +24,31 @@ module fpga_top (
   output wire [4:0] led      // PIO_1[10:14]
 ) /* synthesis syn_hier="fixed" */;
 
+  wire apu_clk;
+
   wire blink;
   wire link;
+  wire noise;
+  wire square1;
+  wire square2;
   wire pwm;
-  wire apu_clk;
+  wire triangle;
 
   assign led[0] = blink;           // D1, 1 Hz blink
   assign led[1] = link;            // D3, RX activity status
   assign led[2] = dtrn;            // D2, DTRn from COM
   assign led[3] = rtsn;            // D4, RTSn from COM
   assign led[4] = ( ui_in != 0 );  // D5, power (center green LED)
-  assign uo_out[0] = 0;
-  assign uo_out[1] = 0;
-  assign uo_out[2] = 0;
-  assign uo_out[3] = pwm;  // PWM audio output
-  assign uo_out[4] = 0;
-  assign uo_out[5] = 0;
-  assign uo_out[6] = 0;
-  assign uo_out[7] = 0;
-  assign tx = rx;  // serial loop-back to host
 
+  assign uo_out[0] = blink;     // 1 Hz blink
+  assign uo_out[1] = link;      // RX activity status
+  assign uo_out[2] = 0;
+  assign uo_out[3] = pwm;       // Merged PWM audio output
+  assign uo_out[4] = square1;   // Square1 channel
+  assign uo_out[5] = square2;   // Square2 channel
+  assign uo_out[6] = triangle;  // Triangle channel
+  assign uo_out[7] = noise;     // Triangle channel
+  
   prescaler #(
     .OSCRATE(12_000_000),  // oscillator frequency
     .APURATE(1_790_000)    // desired system clock frequency
@@ -56,11 +61,16 @@ module fpga_top (
     .CLKRATE(2_000_000),  // actual APU clock frequency
     .BAUDRATE(9600)       // serial baud rate
   ) apu_inst (
-    .clk  (apu_clk),
-    .rx   (rx),
-    .blink(blink),
-    .link (link),
-    .pwm  (pwm)
+    .clk     (apu_clk),
+    .rx      (rx),
+    .blink   (blink),
+    .link    (link),
+    .noise   (noise),
+    .square1 (square1),
+    .square2 (square2),
+    .pwm     (pwm),
+    .triangle(triangle),
+    .tx      (tx) 
   );
 
 endmodule

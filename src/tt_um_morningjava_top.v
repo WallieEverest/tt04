@@ -8,8 +8,12 @@
 // Description:
 //   Tiny Tapeout project for the Efabless Caravel device.
 //   Targets the SkyWater 130nm PDK.
-//   An external PWM low-pass filter is set for 4 kHz.
+//   An external PWM low-pass filter is set at 4 kHz.
 //   The external serial COM port is set for 9600 baud.
+// To do:
+//   The initial goal was to generate sound effects in the four individual generators.
+//   Four-byte control sequences is the extent of the test benches.
+//   Future work is to demonstrate music synthesis using periodic update of the generators.
 
 `default_nettype none
 
@@ -28,17 +32,22 @@ module tt_um_morningjava_top (
 
   wire blink;
   wire link;
+  wire noise;
+  wire square1;
+  wire square2;
   wire pwm;
-  wire rx = ui_in[2];        // UART RX
+  wire triangle;
+  wire tx;
+  wire rx = ui_in[2];  // UART RX
 
-  assign uo_out[0] = 0;
-  assign uo_out[1] = 0;
-  assign uo_out[2] = rx;     // UART TX, serial loop-back to host
-  assign uo_out[3] = pwm;    // PWM audio output
-  assign uo_out[4] = 0;
-  assign uo_out[5] = 0;
-  assign uo_out[6] = blink;  // 1 Hz blink
-  assign uo_out[7] = link;   // RX activity status
+  assign uo_out[0] = blink;     // 1 Hz blink
+  assign uo_out[1] = link;      // RX activity status
+  assign uo_out[2] = tx;        // UART TX, serial loop-back to host
+  assign uo_out[3] = pwm;       // Merged PWM audio output
+  assign uo_out[4] = square1;   // Square1 channel
+  assign uo_out[5] = square2;   // Square2 channel
+  assign uo_out[6] = triangle;  // Triangle channel
+  assign uo_out[7] = noise;     // Triangle channel
   assign uio_out = 0;
   assign uio_oe = 0;
 
@@ -46,11 +55,16 @@ module tt_um_morningjava_top (
     .CLKRATE(1_789_773),  // actual APU clock frequency
     .BAUDRATE(9600)       // serial baud rate
   ) apu_inst (
-    .clk  (clk),
-    .rx   (rx),
-    .blink(blink),
-    .link (link),
-    .pwm  (pwm)
+    .clk     (clk),
+    .rx      (rx),
+    .blink   (blink),
+    .link    (link),
+    .noise   (noise),
+    .square1 (square1),
+    .square2 (square2),
+    .pwm     (pwm),
+    .triangle(triangle),
+    .tx      (tx)
   );
 
 endmodule

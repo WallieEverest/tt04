@@ -1,5 +1,6 @@
 fpga
 sim
+!sim/tt04.mpf
 pcb
 gds
 gds_logs
