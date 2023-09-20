@@ -4,14 +4,14 @@
 
 This project replicates the Audio Processing Unit (APU) of vintage video games.
 
-## Statistics
+# Statistics
 
 - Tiles: 2x2
 - DFF: 417
 - Total Cells: 2549
 - Utilization: 32%
 
-## TinyTapeout 4 Configuration
+# TinyTapeout 4 Configuration
 
 ![Top Level Drawing](image/tt04.svg)
 
@@ -23,7 +23,7 @@ Based on data from:
 - https://github.com/TinyTapeout/tt-multiplexer/blob/main/docs/INFO.md
 - https://open-source-silicon.slack.com/archives/C016N88BX44/p1688915892223379
 
-### MPRJ_IO Pin Assignments
+## MPRJ_IO Pin Assignments
 | Signal      | Name       | Dir | QFN | PCB   |
 | ----------- | ---------- |---- |---- |------ |
 | mprj_io[0]  | jtag       | in  | 31  |       |
@@ -65,7 +65,7 @@ Based on data from:
 | mprj_io[36] | sel_rst_n  | in  | 15  |       |
 | mprj_io[37] | spare      |     | 16  |       |
 
-### APU Operation
+## APU Operation
 
 The audio portion of the project consists of two rectangular pulse generators, a triangle wave generator, and a noise generator.
 Each module is controlled by four 8-bit registers.
@@ -76,7 +76,7 @@ Only the lower 4-bits of the address are decoded.
 
 - https://www.nesdev.org/wiki/APU
 
-### UART Operation
+## UART Operation
 - A register address and data are recovered from two consecutive serial bytes.
 - A byte with the msb=0 is considered the first byte with 7-bits of data.
 - A byte with msb=1 is considered the second byte with the remaining 1-bit of data and a 6-bit address.
@@ -87,10 +87,10 @@ Byte 1                             Byte 2
 Start D0 D1 D2 D3 D4 D5 D6 0 Stop  Start D7 A0 A1 A2 A3 A4 A5 1 Stop
 ```
 
-### Pin Assignments
+## Pin Assignments
 | Signal       | Name     | Signal       | Name     |
 | ------------ | ---------| ------------ | ---------|
-| clk          | 12 MHz   | ena          | spare    |
+| clk          | 1.79 MHz | ena          | spare    |
 | rst_n        | spare    | uio_oe[7:0]  | spare    |
 | ui_in[0]     | spare    | uo_out[0]    | blink    |
 | ui_in[1]     | spare    | uo_out[1]    | link     |
@@ -102,7 +102,7 @@ Start D0 D1 D2 D3 D4 D5 D6 0 Stop  Start D7 A0 A1 A2 A3 A4 A5 1 Stop
 | ui_in[7]     | spare    | uo_out[7]    | noise    |
 | uio_in[7:0]  | spare    | uio_out[7:0] | spare    |
 
-## How to test
+# How to test
 
 The ChipTune project can be interfaced to a computer COM port (9600,n,8,1).
 An analog PWM filter and audio driver are needed for the test rig.
@@ -151,6 +151,6 @@ The following serial strings will activate example functions
 
 All relevant signals are available on the motherboard's PMOD connectors. The system clock is generated on the motherboard.
 
-## Summary
+# Summary
 
 An external serial port can play synthetic game music through this TT04 project.

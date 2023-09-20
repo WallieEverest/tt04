@@ -36,16 +36,16 @@ documentation:
     Input is from a serial UART interface.
     Output is PWM audio.
 
-    ## Overview
+    # Overview
     This project replicates the Audio Processing Unit (APU) of vintage video games.
 
-    ## Statistics
+    # Statistics
     - Tiles: 2x2
     - DFF: 417
     - Total Cells: 2549
     - Utilization: 32%
 
-    ### TinyTapeout 4 Configuration
+    # TinyTapeout 4 Configuration
     TT04 devices from the eFabless Multi-Project Wafer (MPW) shuttle are delivered in QFN-64 packages, mounted on a daughterboard for breakout.
 
     Based on data from:
@@ -54,7 +54,7 @@ documentation:
     - https://github.com/TinyTapeout/tt-multiplexer/blob/main/docs/INFO.md
     - https://open-source-silicon.slack.com/archives/C016N88BX44/p1688915892223379
 
-    ### MPRJ_IO Pin Assignments
+    ## MPRJ_IO Pin Assignments
     | Signal      | Name       | Dir | QFN | PCB   |
     | ----------- | ---------- |---- |---- |------ |
     | mprj_io[0]  | jtag       | in  | 31  |       |
@@ -96,7 +96,7 @@ documentation:
     | mprj_io[36] | sel_rst_n  | in  | 15  |       |
     | mprj_io[37] | spare      |     | 16  |       |
 
-    ### APU Operation
+    ## APU Operation
     The audio portion of the project consists of two rectangular pulse generators, a triangle wave generator, and a noise generator.
     Each module is controlled by four 8-bit registers.
     Configurable parameters are the frequency, duty cycle, sweep, decay, and note duration.
@@ -106,7 +106,7 @@ documentation:
 
     - https://www.nesdev.org/wiki/APU
 
-    ### UART Operation
+    ## UART Operation
     - A register address and data are recovered from two consecutive serial bytes.
     - A byte with the msb=0 is considered the first byte with 7-bits of data.
     - A byte with msb=1 is considered the second byte with the remaining 1-bit of data and a 6-bit address.
@@ -117,10 +117,10 @@ documentation:
     Start D0 D1 D2 D3 D4 D5 D6 0 Stop  Start D7 A0 A1 A2 A3 A4 A5 1 Stop
     ```
 
-    ### Pin Assignments
+    ## Pin Assignments
     | Signal       | Name     | Signal       | Name     |
     | ------------ | ---------| ------------ | ---------|
-    | clk          | 12 MHz   | ena          | spare    |
+    | clk          | 1.79 MHz | ena          | spare    |
     | rst_n        | spare    | uio_oe[7:0]  | spare    |
     | ui_in[0]     | spare    | uo_out[0]    | blink    |
     | ui_in[1]     | spare    | uo_out[1]    | link     |
